@@ -36,18 +36,7 @@ public class TCPClient implements ClientInterface {
 		// TODO Auto-generated method stub
 
 	}
-	// End of interface functions 
-	
-	
-	// Start of information managing functions
-	private void loadNodes(){
-		// TODO implement loadNodes
-	}
-	private void saveNodes() {
-		// TODO implement saveNodes
-	}
-	// End of information managing functions
-	
+	// End of interface functions 	
 	
 	
 	
