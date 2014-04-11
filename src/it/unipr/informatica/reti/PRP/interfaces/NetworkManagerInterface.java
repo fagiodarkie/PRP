@@ -7,5 +7,5 @@ public interface NetworkManagerInterface {
 	 */
 	public abstract boolean isConnected(String nick);
 	public abstract NodeInformation getInfoByNick(String nick);
-	
+	public abstract String howToReach(String Nick);
 }

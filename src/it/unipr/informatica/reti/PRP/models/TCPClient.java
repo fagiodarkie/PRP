@@ -1,4 +1,4 @@
-package it.unipr.informatica.PRP.modules;
+package it.unipr.informatica.reti.PRP.models;
 
 import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
 
