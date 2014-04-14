@@ -2,7 +2,7 @@ package it.unipr.informatica.reti.PRP.interfaces;
 
 import java.security.Timestamp;
 
-public abstract class MessageInterface {
+public abstract interface MessageInterface {
 
 	public abstract String getSender();
 	public abstract String getReceiver();

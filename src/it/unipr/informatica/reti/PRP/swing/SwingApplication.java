@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
 
+import it.unipr.informatica.reti.PRP.interfaces.CacheInterface;
+import it.unipr.informatica.reti.PRP.interfaces.NetworkMantainer;
 import it.unipr.informatica.reti.PRP.interfaces.PRPApplication;
 import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
 import it.unipr.informatica.reti.PRP.interfaces.MessageInterface;
@@ -18,13 +20,15 @@ public class SwingApplication implements PRPApplication {
 
 	// Start of application components.
 	private ClientInterface clientInterface;
-	private JFrame mainWindow;
-	private JDialog loginDialog;
 	private NetworkManagerInterface network;
+	private NetworkMantainer mantainer;
+	private CacheInterface cache;
 	private MessageInterface composedMessage;
 	// End of application components.
 	
 	// Start of graphic components.
+	private JFrame mainWindow;
+	private JDialog loginDialog;
 	private LogPanel logPanel;
 	private ContactPanel contactPanel;
 	private ConversationPanel conversationPanel;
@@ -36,9 +40,11 @@ public class SwingApplication implements PRPApplication {
 	
 	@Override
 	public void run() {
-		logPanel = new LogPanel();
+		
+		// Start of graphic component creation
+		logPanel = new LogPanel(this);
 		contactPanel = new ContactPanel(this);
-		conversationPanel = new ConversationPanel();
+		conversationPanel = new ConversationPanel(this);
 		chatBox = new ChatBox(this);
 		
 		JPanel leftGrid = new JPanel();
@@ -59,6 +65,10 @@ public class SwingApplication implements PRPApplication {
 		contentPane.add(leftGrid, BorderLayout.WEST);
 		contentPane.add(centralPanel, BorderLayout.CENTER);
 		mainWindow.setVisible(true);
+		// End of graphic component creation
+		
+		
+		
 	}
 	
 	public void loggedOn(String loggedNick) {

@@ -8,8 +8,11 @@ import javax.swing.JTextField;
 public class LogPanel extends JPanel {
 	
 	private JTextField field;
+	private SwingApplication parentApplication;
 	
-	public LogPanel() {
+	public LogPanel(SwingApplication swingApplication) {
+		
+		parentApplication = swingApplication;
 		
 		setLayout(new BorderLayout());
 		field = new JTextField();
