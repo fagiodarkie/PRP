@@ -6,24 +6,37 @@ import it.unipr.informatica.reti.PRP.interfaces.NodeInformation;
 
 public class UserInformations implements NodeInformation {
 
-	// TODO FAGIO
+	private String nick;
+	private int port;
+	private InetAddress address;
 	
+	public UserInformations(String newNick, int newPort, InetAddress inetAddress) {
+		nick = newNick;
+		port = newPort;
+		address = inetAddress;
+	}
+	
+	
+	public UserInformations(NodeInformation identity) {
+		nick = identity.getNick();
+		port = identity.getPort();
+		address = identity.getAddress();
+	}
+
+
 	@Override
 	public String getNick() {
-		// TODO Auto-generated method stub
-		return null;
+		return nick;
 	}
 
 	@Override
 	public int getPort() {
-		// TODO Auto-generated method stub
-		return 0;
+		return port;
 	}
 
 	@Override
 	public InetAddress getAddress() {
-		// TODO Auto-generated method stub
-		return null;
+		return address;
 	}
 
 }
