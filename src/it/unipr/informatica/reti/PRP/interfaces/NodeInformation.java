@@ -14,4 +14,6 @@ public interface NodeInformation {
 	public abstract int getPort();
 	public abstract InetAddress getAddress();
 	
+	public abstract boolean equals(NodeInformation i);
+	
 }

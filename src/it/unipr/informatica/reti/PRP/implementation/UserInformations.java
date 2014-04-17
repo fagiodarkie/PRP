@@ -24,6 +24,11 @@ public class UserInformations implements NodeInformation {
 	}
 
 
+	public UserInformations(String newInterface) {
+		
+	}
+
+
 	@Override
 	public String getNick() {
 		return nick;
@@ -37,6 +42,14 @@ public class UserInformations implements NodeInformation {
 	@Override
 	public InetAddress getAddress() {
 		return address;
+	}
+
+
+	@Override
+	public boolean equals(NodeInformation i) {
+		return nick.equals(i.getNick())
+			&& (port == i.getPort())
+			&& address.equals(i.getAddress());
 	}
 
 }
