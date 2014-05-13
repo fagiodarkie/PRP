@@ -9,10 +9,19 @@ import it.unipr.informatica.reti.PRP.swing.SwingApplication;
 
 public class Connections implements ClientInterface {
 
-	
+	/**
+	 * Module abstracting the communication with other clients.
+	 * All messages sent or received pass through Connections, which redirects
+	 * them in the right direction (routing, grapical user interface, table update, ...)
+	 */
 	
 	private SwingApplication application;
 
+	/**
+	 * Default constructor for Connections in gui version of the application.
+	 * 
+	 * @param swingApplication class containing the Connections module.
+	 */
 	public Connections(SwingApplication swingApplication) {
 		application = swingApplication;
 	}

@@ -7,6 +7,13 @@ import javax.swing.JTextField;
 
 public class LogPanel extends JPanel {
 	
+	/**
+	 * Shows log informations:
+	 * - connected and disconnected nodes
+	 * - communication errors
+	 * - topology updates
+	 */
+	
 	private JTextField field;
 	private SwingApplication parentApplication;
 	

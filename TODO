@@ -1,0 +1,5 @@
+1) Add a caching mechanism that buffers the message which should be sent to disconnected nicks and tries to send them as soon as they are reachable.
+2) Implement a nicer "connect to this node" selection.
+3) Implement the network as a balanced tree rather than a graph and provide methods to reliably connect and balance the network tree.
+4) Implement user groups to exploit Multicast.
+5) Implement friendship mechanism for connection and message sending. 

@@ -10,6 +10,10 @@ import javax.swing.JTextField;
 
 public class ContactPanel extends JPanel {
 	
+	/**
+	 * List of connected nodes.
+	 */
+	
 	private SwingApplication parentPanel;
 	private JTextField contacts;
 	private List<NodeInformation> contactList;

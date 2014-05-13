@@ -15,7 +15,6 @@ import it.unipr.informatica.reti.PRP.implementation.Connections;
 import it.unipr.informatica.reti.PRP.implementation.NetworkKeeper;
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
 import it.unipr.informatica.reti.PRP.implementation.UserInformations;
-import it.unipr.informatica.reti.PRP.interfaces.CacheInterface;
 import it.unipr.informatica.reti.PRP.interfaces.NetworkMantainer;
 import it.unipr.informatica.reti.PRP.interfaces.NodeInformation;
 import it.unipr.informatica.reti.PRP.interfaces.PRPApplication;
@@ -32,11 +31,16 @@ import javax.swing.border.Border;
 
 public class SwingApplication implements PRPApplication {
 
+	/**
+	 * Main application component.
+	 * Wraps the gui components, as well as the network modules,
+	 * and manages the conversation between them.
+	 */
+	
 	// Start of application components.
 	private ClientInterface clientInterface;
 	private NetworkManagerInterface network;
 	private NetworkMantainer mantainer;
-	private CacheInterface cache;
 	private MessageInterface composedMessage;
 	private List<NodeInformation> nicks;
 	// End of application components.
@@ -107,8 +111,7 @@ public class SwingApplication implements PRPApplication {
 		clientInterface = new Connections(this);
 		mantainer = new NetworkKeeper(this);
 		network = new TableManager(this);
-		cache = new SwingCache(this);
-		// Endo of network component creation
+		// End of network component creation
 		
 		
 	}

@@ -6,6 +6,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class ChatBox extends JPanel {
+	
+	/**
+	 * Field in which the user can write to the selected node.
+	 */
 
 	private SwingApplication parentPanel;
 	private JTextField chatField;

@@ -18,6 +18,12 @@ import javax.swing.table.TableModel;
 
 @SuppressWarnings("serial")
 public class NodeSelectionTable extends JPanel {
+	
+	/**
+	 * Provides a screen in which is possible to select the node
+	 * to be used as entry point for the network.
+	 */
+	
 	private JTable table;
 	private List<NodeInformation> nodes;
 	private SwingApplication application;
