@@ -9,11 +9,11 @@ import it.unipr.informatica.reti.PRP.interfaces.server;
 import it.unipr.informatica.reti.PRP.utils.Constants;
 
 //START SERVER CLASS
-public class serverComponent implements server {
+public class ServerComponent implements server {
 	//START STATO INTERNO
 	private ServerSocket serverSocket;
 	Hashtable<String, Client> hashTableNickClients = new Hashtable<String, Client>();
-		Hashtable<String,String> hashTableNickNick = new Hashtable<String, String>();
+	Hashtable<String,String> hashTableNickNick = new Hashtable<String, String>();
 		
 	//END STATO INTERNO
 	
@@ -53,7 +53,7 @@ public class serverComponent implements server {
 						switch(partsOfMessage[0])
 						{
 						case "1":
-							serverComponent.this.SendTo(partsOfMessage[2], Message);
+							ServerComponent.this.SendTo(partsOfMessage[2], Message);
 							break;
 						case "2"://messaggio Broadcast quindi invio a tutti
 							for (String nick : hashTableNickClients.keySet()) {
@@ -97,8 +97,8 @@ public class serverComponent implements server {
 					
 				});
 				
-				 serverComponent.this.hashTableNickClients.put(c.getNick(), c);
-		         serverComponent.this.hashTableNickNick.put(c.getNick(), c.getNick());
+				 ServerComponent.this.hashTableNickClients.put(c.getNick(), c);
+		         ServerComponent.this.hashTableNickNick.put(c.getNick(), c.getNick());
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
