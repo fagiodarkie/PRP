@@ -2,13 +2,17 @@ package it.unipr.informatica.reti.PRP;
 
 import it.unipr.informatica.reti.PRP.UserInterface.UserInterface;
 import it.unipr.informatica.reti.PRP.implementation.ServerComponent;
-import it.unipr.informatica.reti.PRP.interfaces.PRPApplication;
+import it.unipr.informatica.reti.PRP.implementation.TableManager;
 import it.unipr.informatica.reti.PRP.interfaces.UserInterfaceCommandManager;
 
 public class PRPClient {
 
 	public static void main(String args[]) {
 	
+		
+	TableManager tableManager = new TableManager();
+		
+		
 	//STEP 1 CREATE AND INITIALIZE USER INTERFACE
 		
 		UserInterface userInterface = new UserInterface(new UserInterfaceCommandManager() {
