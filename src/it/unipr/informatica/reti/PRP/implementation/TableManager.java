@@ -3,7 +3,6 @@ package it.unipr.informatica.reti.PRP.implementation;
 import java.util.List;
 import it.unipr.informatica.reti.PRP.interfaces.NetworkManagerInterface;
 import it.unipr.informatica.reti.PRP.interfaces.NodeInformation;
-import it.unipr.informatica.reti.PRP.swing.SwingApplication;
 
 public class TableManager implements NetworkManagerInterface {
 
@@ -55,23 +54,11 @@ public class TableManager implements NetworkManagerInterface {
 	}
 	
 	/**
-	 * parent module for gui application. All notifications regarding a gui
-	 * update must be forwarded to the gui.
-	 */
-	private SwingApplication application;
-	/**
 	 * actual map, that is looked up to get informations about the network.
 	 */
 	private List<Couple> howToReach;
 	
-	/**
-	 * gui constructor
-	 * @param swingApplication the gui parent, to which updates regarding gui must be notified
-	 */
-	public TableManager(SwingApplication swingApplication) {
-		application = swingApplication;
-	}
-
+	
 	@Override
 	/**
 	 * @param nick the nick of the user whose status should be checked.
