@@ -27,7 +27,7 @@ public class PRPClient {
 	//STEP 2 READ DATA AND CONNECT TO DAD
 		
 	//STEP 3 CREATE SERVER LISTENER
-		ServerComponent serverComponent = new ServerComponent();
+		ServerComponent serverComponent = new ServerComponent(tableManager);
 	
 	
 	}

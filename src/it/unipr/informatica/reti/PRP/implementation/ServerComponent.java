@@ -12,12 +12,15 @@ import it.unipr.informatica.reti.PRP.utils.Constants;
 public class ServerComponent implements server {
 	//START STATO INTERNO
 	private ServerSocket serverSocket;
-	Hashtable<String, Client> hashTableNickClients = new Hashtable<String, Client>();
-	Hashtable<String,String> hashTableNickNick = new Hashtable<String, String>();
+	TableManager tableManager ;
 		
 	//END STATO INTERNO
 	
 	//START CONSTRUCTOR
+	public ServerComponent(TableManager manager)
+	{
+		this.tableManager = manager;
+	}
 	//END CONSTRUCTOR
 	
 	//START CONNECTION MANAGEMENT METHOD
@@ -56,9 +59,11 @@ public class ServerComponent implements server {
 							ServerComponent.this.SendTo(partsOfMessage[2], Message);
 							break;
 						case "2"://messaggio Broadcast quindi invio a tutti
-							for (String nick : hashTableNickClients.keySet()) {
+							/*for (String nick : hashTableNickClients.keySet()) {
 								hashTableNickClients.get(nick).SendMessage(Message);
-							}
+							}*/
+							//TODO IMPLEMENT BROADCAST;
+							
 							break;
 						case "3":
 							//do nothing
@@ -67,19 +72,21 @@ public class ServerComponent implements server {
 							//TODO gestione nick backup
 							break;
 						case "5":
-							hashTableNickNick.put(Client, partsOfMessage[1]);
+							/*hashTableNickNick.put(Client, partsOfMessage[1]);
 							for (String nick : hashTableNickClients.keySet()) {
 								if(nick != partsOfMessage[1])
 								hashTableNickClients.get(nick).SendMessage(Message);
-							}
+							}*/
+							//TODO IMPLEMENT POINT 5 
 							break;
 						case "6":
 							//rimuovo il collegamento e invio
-							if(hashTableNickClients.keySet().contains(partsOfMessage[1]))
+							/*if(hashTableNickClients.keySet().contains(partsOfMessage[1]))
 							{
 								hashTableNickNick.remove(partsOfMessage[1]);
 							}
-							SendAll(Message);
+							SendAll(Message);*/
+							//TODO IMPLEMENT POINT 6
 							
 							break;
 						case "7":
@@ -96,10 +103,11 @@ public class ServerComponent implements server {
 					}
 					
 				});
-				
+				/*
 				 ServerComponent.this.hashTableNickClients.put(c.getNick(), c);
 		         ServerComponent.this.hashTableNickNick.put(c.getNick(), c.getNick());
-				
+				*/
+				//TODO IMPLEMENT INSERTIONF OF NEW CLIENT
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -124,13 +132,17 @@ public class ServerComponent implements server {
 	//START MESSAGES MANAGEMENT
 	public Boolean SendTo(String nick,String message)
 	{
-		//se la chiave passata è un nick valido
+		/*
+		 * //se la chiave passata è un nick valido
 		if (hashTableNickClients.keySet().contains(nick))
 			return hashTableNickClients.get(nick).SendMessage(message);
 		else//altrimenti guardo se è un ip valido
 			if(hashTableNickNick.keySet().contains(nick))
 				return hashTableNickClients.get(hashTableNickNick.get(nick)).SendMessage(message);
 		//altrimenti mi è impossibile inviare un messaggio
+		 * */
+		
+		//TODO IMPLEMENT SEND TO
 		return false;
 	}
 	public void SendAll(String message)
