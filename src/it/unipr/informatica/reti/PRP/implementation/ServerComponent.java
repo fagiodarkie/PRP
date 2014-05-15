@@ -2,7 +2,6 @@ package it.unipr.informatica.reti.PRP.implementation;
 
 import java.io.*;
 import java.net.*;
-import java.util.Hashtable;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.interfaces.clientCommunicationManagerInterface;
@@ -46,59 +45,41 @@ public class ServerComponent implements server {
 					
 					@Override
 					public void ManageMessage(String[] PartsOfMessage) {
-						PartsOfMessage[0]="5";
-						String newMessage = PartsOfMessage[0]+ Constants.MessagePartsDivisor+
-											PartsOfMessage[1]+ Constants.MessagePartsDivisor+
-											PartsOfMessage[2];
-						SendAll(newMessage);
+						//TODO INVIARE A TUTTI IL MESSAGGIO IL REACHABLE
 					}
 					
 					@Override
 					public void ManageMessage(String Message,String Client) {
+						
 						//STEP 1 scompongo il messaggio
 						String partsOfMessage[] = Message.split(Constants.MessagePartsDivisor);
-						//STEP 2 controllo che genere di messaggio e'
+						
+						//STEP 2 controllo che genere di messaggio e' e lo gestisco
 						switch(partsOfMessage[0])
 						{
-						case "1":
-							ServerComponent.this.SendTo(partsOfMessage[2], Message);
+						case Constants.MessageHelloCode :
+							//TODO GESTIONE ARRIVO HELLO
 							break;
-						case "2"://messaggio Broadcast quindi invio a tutti
-							/*for (String nick : hashTableNickClients.keySet()) {
-								hashTableNickClients.get(nick).SendMessage(Message);
-							}*/
+						case Constants.MessageBroadcastCode :
+
 							//TODO IMPLEMENT BROADCAST;
 							
 							break;
-						case "3":
-							//do nothing
-							break;
-						case "4":
+						case Constants.MessageBackupNickCode:
 							//TODO gestione nick backup
 							break;
-						case "5":
-							/*hashTableNickNick.put(Client, partsOfMessage[1]);
-							for (String nick : hashTableNickClients.keySet()) {
-								if(nick != partsOfMessage[1])
-								hashTableNickClients.get(nick).SendMessage(Message);
-							}*/
-							//TODO IMPLEMENT POINT 5 
+						case Constants.MessageReachableCode :
+							//TODO GESTIONE ARRIVO MESSAGGIO REACHABLE 
 							break;
-						case "6":
-							//rimuovo il collegamento e invio
-							/*if(hashTableNickClients.keySet().contains(partsOfMessage[1]))
-							{
-								hashTableNickNick.remove(partsOfMessage[1]);
-							}
-							SendAll(Message);*/
-							//TODO IMPLEMENT POINT 6
+						case Constants.MessageNotReachableCode :
+							//TODO GESTIONE ARRIVO MESSAGGIO NOTREACHABLE 
 							
 							break;
-						case "7":
+						case Constants.MessageTableCode:
+							//TODO GESTIONE ARRIVO MESSAGGIO TABLE
 							break;
 						
 						}
-						//STEP 3 gestisco il messaggio
 						
 					}
 					@Override
@@ -138,25 +119,8 @@ public class ServerComponent implements server {
 	}
 	//END CONNECTION MANAGEMENT METHOD
 	
-	//START MESSAGES MANAGEMENT
-	public Boolean SendTo(String nick,String message)
-	{
-		/*
-		 * //se la chiave passata è un nick valido
-		if (hashTableNickClients.keySet().contains(nick))
-			return hashTableNickClients.get(nick).SendMessage(message);
-		else//altrimenti guardo se è un ip valido
-			if(hashTableNickNick.keySet().contains(nick))
-				return hashTableNickClients.get(hashTableNickNick.get(nick)).SendMessage(message);
-		//altrimenti mi è impossibile inviare un messaggio
-		 * */
-		
-		//TODO IMPLEMENT SEND TO
-		return false;
+	
+	//GESTIONE MESSAGGI
 	}
-	public void SendAll(String message)
-	{}
-	//END MESSAGES MANAGEMENT
-}
 //END SERVER CLASS
 

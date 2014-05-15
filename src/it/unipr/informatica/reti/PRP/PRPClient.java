@@ -1,7 +1,6 @@
 package it.unipr.informatica.reti.PRP;
 
 import it.unipr.informatica.reti.PRP.UserInterface.UserInterface;
-import it.unipr.informatica.reti.PRP.implementation.ClientCommunicationManager;
 import it.unipr.informatica.reti.PRP.implementation.Connections;
 import it.unipr.informatica.reti.PRP.implementation.ServerComponent;
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
@@ -39,7 +38,8 @@ public class PRPClient {
 			}
 		});
 	
-	
+	//faccio partire il server:
+		serverComponent.start();
 	}
 	
 }

@@ -1,16 +1,18 @@
 package it.unipr.informatica.reti.PRP.implementation;
 
+import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
+
 import java.util.*;
 public class Connections {
 
 	//stato interno
-	Hashtable<String, Client> hashtableNickClient;
+	Hashtable<String, ClientInterface> hashtableNickClient;
 	//end stato interno
 	
 	
 	public Connections()
 	{
-		hashtableNickClient = new Hashtable<String, Client>();
+		hashtableNickClient = new Hashtable<String, ClientInterface>();
 	}
 	
 	/**
@@ -42,7 +44,7 @@ public class Connections {
 		return true;
 	}
 	
-	public Client getClient (String nick)
+	public ClientInterface getClient (String nick)
 	{
 		if(!hashtableNickClient.keySet().contains(nick))
 			return null;

@@ -1,15 +1,14 @@
 package it.unipr.informatica.reti.PRP.implementation;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
 import it.unipr.informatica.reti.PRP.interfaces.Command;
-import it.unipr.informatica.reti.PRP.interfaces.clientCommunicationManagerInterface;
 import it.unipr.informatica.reti.PRP.utils.Constants;
 
-public class Client {
+public class Client implements ClientInterface{
 	ClientCommunicationManager clientCommunicationManager;
 	String clientNick;
 	int clientPort;
@@ -51,19 +50,22 @@ public class Client {
 		
 	}
 	
-	
+	@Override
 	public String getNick()
 	{
 		return this.clientNick;
 	}
+	@Override
 	public int getPort()
 	{
 		return this.clientPort;
 	}
+	@Override
 	public InetAddress getIP()
 	{
 		return this.clientIP;
 	}
+	@Override
 	public Boolean SendMessage(String message)
 	{
 		return clientCommunicationManager.SendMessage(message);
