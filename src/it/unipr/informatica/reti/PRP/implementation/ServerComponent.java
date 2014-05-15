@@ -102,10 +102,16 @@ public class ServerComponent implements server {
 						
 					}
 					@Override
-					public void ManageDisconnection(String Name) {
-						// TODO Gestire Disconnessione
+					public void ManageDisconnection(String nick) {
+						if(tableManager.isNearMe(nick)){
+							//tolgo l'interfaccia con il client
+							connections.removeClient(nick);
+						}
+						//aggiorno la tabella delle interfacce
+						tableManager.disconnected(nick);
+						//invio all'interfaccia utente il comando di stampare il messaggio che l'utente si è disconnesso
+						commandClientCommunicationManagerInterface.SendMessage(nick+" is disconnected");
 						
-						System.out.println(Name+" si è disconnesso");
 					}
 					
 				});
