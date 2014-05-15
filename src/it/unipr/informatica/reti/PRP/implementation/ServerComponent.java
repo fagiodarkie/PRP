@@ -5,21 +5,26 @@ import java.net.*;
 import java.util.Hashtable;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
+import it.unipr.informatica.reti.PRP.interfaces.clientCommunicationManagerInterface;
 import it.unipr.informatica.reti.PRP.interfaces.server;
 import it.unipr.informatica.reti.PRP.utils.Constants;
 
 //START SERVER CLASS
 public class ServerComponent implements server {
+	
 	//START STATO INTERNO
 	private ServerSocket serverSocket;
 	TableManager tableManager ;
-		
+	clientCommunicationManagerInterface commandClientCommunicationManagerInterface;
+	Connections connections;
 	//END STATO INTERNO
 	
 	//START CONSTRUCTOR
-	public ServerComponent(TableManager manager)
+	public ServerComponent(TableManager manager,Connections connessioni, clientCommunicationManagerInterface command)
 	{
 		this.tableManager = manager;
+		this.commandClientCommunicationManagerInterface = command;
+		this.connections = connessioni;
 	}
 	//END CONSTRUCTOR
 	
@@ -99,15 +104,13 @@ public class ServerComponent implements server {
 					@Override
 					public void ManageDisconnection(String Name) {
 						// TODO Gestire Disconnessione
+						
 						System.out.println(Name+" si è disconnesso");
 					}
 					
 				});
-				/*
-				 ServerComponent.this.hashTableNickClients.put(c.getNick(), c);
-		         ServerComponent.this.hashTableNickNick.put(c.getNick(), c.getNick());
-				*/
-				//TODO IMPLEMENT INSERTIONF OF NEW CLIENT
+				connections.addClient(c.getNick(),c);
+				tableManager.isNowReachedBy(c.getNick(), c.getNick());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
