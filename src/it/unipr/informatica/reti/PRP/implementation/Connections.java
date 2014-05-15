@@ -1,50 +1,62 @@
 package it.unipr.informatica.reti.PRP.implementation;
 
-import java.util.List;
+import java.util.*;
+public class Connections {
 
-import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
-import it.unipr.informatica.reti.PRP.interfaces.NetworkManagerInterface;
-import it.unipr.informatica.reti.PRP.interfaces.NodeInformation;
-
-public class Connections implements ClientInterface {
-
-
-
+	//stato interno
+	Hashtable<String, Client> hashtableNickClient;
+	//end stato interno
+	
+	
+	public Connections()
+	{
+		hashtableNickClient = new Hashtable<String, Client>();
+	}
+	
 	/**
-	 * Default constructor for Connections in gui version of the application.
-	 * 
-	 * @param swingApplication class containing the Connections module.
+	 * Insert new client to the list
+	 * @param 
+	 * @param 
+	 * @return return false if the nickname is already used
 	 */
-
-	@Override
-	public void connect() {
-		// TODO Auto-generated method stub
+	public boolean addClient(String nick, Client newClient)
+	{
+		if(hashtableNickClient.keySet().contains(nick))
+			return false;
+		
+		hashtableNickClient.put(nick,newClient);
+		return true;
+	}
+	
+	/**
+	 * Remove the client from the list
+	 * @param 
+	 * @return 
+	 */
+	public boolean removeClient(String nick)
+	{
+		if(!hashtableNickClient.keySet().contains(nick))
+			return false;
+		
+		hashtableNickClient.remove(nick);
+		return true;
+	}
+	
+	public Client getClient (String nick)
+	{
+		if(!hashtableNickClient.keySet().contains(nick))
+			return null;
+		
+		return hashtableNickClient.remove(nick);
 		
 	}
-
-	@Override
-	public void disconnect() {
-		// TODO Auto-generated method stub
+	public boolean setCliet(String nick, Client newClient)
+	{
+		if(!hashtableNickClient.keySet().contains(nick))
+			return false;
 		
+		//TODO SETCLIENT
+		return true;
 	}
-
-	@Override
-	public void unicastMessage(String nickname, String message) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void multicastMessage(List<String> nicks, String message) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void broadcastMessage(String message) {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 }
