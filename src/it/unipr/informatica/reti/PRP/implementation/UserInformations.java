@@ -2,9 +2,9 @@ package it.unipr.informatica.reti.PRP.implementation;
 
 import java.net.InetAddress;
 
-import it.unipr.informatica.reti.PRP.interfaces.NodeInformation;
+import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
 
-public class UserInformations implements NodeInformation {
+public class UserInformations implements UserInformationsInterface {
 
 	/**
 	 * 
@@ -37,11 +37,11 @@ public class UserInformations implements NodeInformation {
 	}
 	
 	/**
-	 * "copy" constructor from another NodeInformation derived.
+	 * "copy" constructor from another UserInformationsInterface derived.
 	 * 
-	 * @param identity the NodeInformation from which the informations should be copied.
+	 * @param identity the UserInformationsInterface from which the informations should be copied.
 	 */
-	public UserInformations(NodeInformation identity) {
+	public UserInformations(UserInformationsInterface identity) {
 		nick = identity.getNick();
 		port = identity.getPort();
 		address = identity.getAddress();
@@ -86,7 +86,7 @@ public class UserInformations implements NodeInformation {
 	 * 			false otherwise. 
 	 */
 	@Override
-	public boolean equals(NodeInformation i) {
+	public boolean equals(UserInformationsInterface i) {
 		return nick.equals(i.getNick())
 			&& (port == i.getPort())
 			&& address.equals(i.getAddress());

@@ -1,10 +1,10 @@
 package it.unipr.informatica.reti.PRP.implementation;
 
 import java.util.List;
-import it.unipr.informatica.reti.PRP.interfaces.NetworkManagerInterface;
-import it.unipr.informatica.reti.PRP.interfaces.NodeInformation;
+import it.unipr.informatica.reti.PRP.interfaces.NetworkTableInterface;
+import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
 
-public class TableManager implements NetworkManagerInterface {
+public class TableManager implements NetworkTableInterface {
 
 	// TODO FAGIO
 
@@ -28,19 +28,19 @@ public class TableManager implements NetworkManagerInterface {
 	 */
 	private class Couple {
 		
-		private NodeInformation reachable;
-		private NodeInformation exitInterface;
+		private UserInformationsInterface reachable;
+		private UserInformationsInterface exitInterface;
 		
-		public Couple(NodeInformation first, NodeInformation second) {
+		public Couple(UserInformationsInterface first, UserInformationsInterface second) {
 			reachable = first;
 			exitInterface = second;
 		}
 		
-		public NodeInformation getReachable() {
+		public UserInformationsInterface getReachable() {
 			return reachable;
 		}
 		
-		public NodeInformation getInterface() {
+		public UserInformationsInterface getInterface() {
 			return exitInterface;
 		}
 		
@@ -48,7 +48,7 @@ public class TableManager implements NetworkManagerInterface {
 			return reachable.equals(exitInterface);
 		}
 		
-		public void resetInterface(NodeInformation newInterface) {
+		public void resetInterface(UserInformationsInterface newInterface) {
 			exitInterface = newInterface;
 		}
 	}
@@ -76,10 +76,10 @@ public class TableManager implements NetworkManagerInterface {
 	/**
 	 * 
 	 * @param nick the nickname of the user whose informations are required
-	 * @returns the NodeInformation structure holding the informations
+	 * @returns the UserInformationsInterface structure holding the informations
 	 * regarding the user. If the user is not connected, null is returned.
 	 */
-	public NodeInformation getInfoByNick(String nick) {
+	public UserInformationsInterface getInfoByNick(String nick) {
 		for (int i = 0; i < howToReach.size(); ++i)
 			if (howToReach.get(i).getReachable().getNick().equals(nick))
 				return howToReach.get(i).getReachable();
@@ -91,11 +91,11 @@ public class TableManager implements NetworkManagerInterface {
 	 * Provides informations about how to reach a given user, given its name.
 	 * 
 	 * @param nick the nickname of the user which should be reached.
-	 * @returns the NodeInformation structure holding the informations
+	 * @returns the UserInformationsInterface structure holding the informations
 	 * regarding the node which can reach the user. If the requested
 	 * user cannot be reached, null is returned.
 	 */
-	public NodeInformation howToReach(String nick) {
+	public UserInformationsInterface howToReach(String nick) {
 		for (int i = 0; i < howToReach.size(); ++i)
 			if (howToReach.get(i).getReachable().getNick().equals(nick)) {
 				return howToReach.get(i).getInterface();
@@ -108,13 +108,13 @@ public class TableManager implements NetworkManagerInterface {
 	 * This method MUST be called when the equivalent message is received.
 	 * It updates the table adjusting the necessary informations.
 	 * 
-	 * @param reached the NodeInformation structure holding the informations regarding
+	 * @param reached the UserInformationsInterface structure holding the informations regarding
 	 * the nick which can be reached by a new interface.
-	 * @param newInterface the NodeInformation structure holding the informations
+	 * @param newInterface the UserInformationsInterface structure holding the informations
 	 * regarding the new interface by which the node may be reached.
 	 */
-	public void isNowReachedBy(NodeInformation reached,
-			NodeInformation newInterface) {
+	public void isNowReachedBy(UserInformationsInterface reached,
+			UserInformationsInterface newInterface) {
 		boolean existed = false;
 		for (int i = 0; i < howToReach.size(); ++i)
 			if (howToReach.get(i).getReachable().equals(reached)) {
@@ -131,12 +131,12 @@ public class TableManager implements NetworkManagerInterface {
 	 * This method MUST be called when the equivalent message is received.
 	 * It updates the table adjusting the necessary informations.
 	 * 
-	 * @param reached the marhsalled NodeInformation of the user which can be reached by a new interface.
-	 * @param newInterface the marshalled NodeInformation of the user by which the node may be reached.
+	 * @param reached the marhsalled UserInformationsInterface of the user which can be reached by a new interface.
+	 * @param newInterface the marshalled UserInformationsInterface of the user by which the node may be reached.
 	 */
 	public void isNowReachedBy(String reached, String newInterface) {
-		NodeInformation reachedNode = new UserInformations(reached);
-		NodeInformation howToReachIt = new UserInformations(newInterface);
+		UserInformationsInterface reachedNode = new UserInformations(reached);
+		UserInformationsInterface howToReachIt = new UserInformations(newInterface);
 		isNowReachedBy(reachedNode, howToReachIt);
 		
 	}

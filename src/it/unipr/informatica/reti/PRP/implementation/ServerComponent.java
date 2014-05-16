@@ -4,22 +4,22 @@ import java.io.*;
 import java.net.*;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
-import it.unipr.informatica.reti.PRP.interfaces.clientCommunicationManagerInterface;
-import it.unipr.informatica.reti.PRP.interfaces.server;
+import it.unipr.informatica.reti.PRP.interfaces.ClientCommunicationManagerInterface;
+import it.unipr.informatica.reti.PRP.interfaces.ServerInterface;
 import it.unipr.informatica.reti.PRP.utils.Constants;
 
 //START SERVER CLASS
-public class ServerComponent implements server {
+public class ServerComponent implements ServerInterface {
 	
 	//START STATO INTERNO
 	private ServerSocket serverSocket;
 	TableManager tableManager ;
-	clientCommunicationManagerInterface commandClientCommunicationManagerInterface;
-	Connections connections;
+	ClientCommunicationManagerInterface commandClientCommunicationManagerInterface;
+	NetworkConnectionsManager connections;
 	//END STATO INTERNO
 	
 	//START CONSTRUCTOR
-	public ServerComponent(TableManager manager,Connections connessioni, clientCommunicationManagerInterface command)
+	public ServerComponent(TableManager manager,NetworkConnectionsManager connessioni, ClientCommunicationManagerInterface command)
 	{
 		this.tableManager = manager;
 		this.commandClientCommunicationManagerInterface = command;
@@ -41,15 +41,15 @@ public class ServerComponent implements server {
 		
 		  while(true){
 			  try {
-				Client c = new Client(serverSocket.accept(), new Command() {
+				ClientManager c = new ClientManager(serverSocket.accept(), new Command() {
 					
 					@Override
-					public void ManageMessage(String[] PartsOfMessage) {
+					public void manageMessage(String[] PartsOfMessage) {
 						//TODO INVIARE A TUTTI IL MESSAGGIO IL REACHABLE
 					}
 					
 					@Override
-					public void ManageMessage(String Message,String Client) {
+					public void manageMessage(String Message,String Client) {
 						
 						//STEP 1 scompongo il messaggio
 						String partsOfMessage[] = Message.split(Constants.MessagePartsDivisor);
@@ -83,7 +83,7 @@ public class ServerComponent implements server {
 						
 					}
 					@Override
-					public void ManageDisconnection(String nick) {
+					public void manageDisconnection(String nick) {
 						if(tableManager.isNearMe(nick)){
 							//tolgo l'interfaccia con il client
 							connections.removeClient(nick);

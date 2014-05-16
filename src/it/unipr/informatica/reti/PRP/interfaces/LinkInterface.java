@@ -1,6 +1,6 @@
 package it.unipr.informatica.reti.PRP.interfaces;
 
-public interface NetInterface {
+public interface LinkInterface {
 	
 	/**	Interface for node-related tasks, such as connecting and sending messages.
 	 */

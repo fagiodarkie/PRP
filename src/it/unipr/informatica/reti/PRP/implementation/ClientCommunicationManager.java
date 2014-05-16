@@ -7,13 +7,14 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
-import it.unipr.informatica.reti.PRP.interfaces.clientCommunicationManagerInterface;
+import it.unipr.informatica.reti.PRP.interfaces.ClientCommunicationManagerInterface;
 import it.unipr.informatica.reti.PRP.utils.Constants;
 
-public class ClientCommunicationManager implements clientCommunicationManagerInterface {
+public class ClientCommunicationManager implements ClientCommunicationManagerInterface {
 
-			ClientWorker clientWorker;
-			Thread t ;
+	ClientWorker clientWorker;
+	Thread t ;
+	
 	public ClientCommunicationManager(Socket socket,Command comandoGestioneMessaggi) throws Exception
 	{
 		//creo il worker da passare al thread per la gestione della ocmunicazione
@@ -38,6 +39,7 @@ public class ClientCommunicationManager implements clientCommunicationManagerInt
 	{
 		
 		t.stop();
+		// TODO check if t.interrupt(); works as well, as it is not deprecated
 	}
 	
 }
@@ -63,7 +65,7 @@ class ClientWorker implements Runnable {
 		    out = new 
 		      PrintWriter(client.getOutputStream(), true); 
 		  } catch (IOException e) {
-		   comando.ManageDisconnection("");
+		   comando.manageDisconnection("");
 		   e.printStackTrace();
 		  }
 	  }
@@ -77,7 +79,7 @@ class ClientWorker implements Runnable {
 		String partsOfMessage[] = message.split(Constants.MessagePartsDivisor);
 		if(partsOfMessage[0].contains("0"))
 		{
-			comando.ManageMessage(partsOfMessage);
+			comando.manageMessage(partsOfMessage);
 		}
 		else
 			throw new Exception("ERRORE");
@@ -93,16 +95,16 @@ class ClientWorker implements Runnable {
 			while(message != null){
 			    try{
 
-					command.ManageMessage(message,"");
+					command.manageMessage(message,"");
 			        message = in.readLine();
 			      
 			      if(message == null)
 			      {
-			    	  command.ManageDisconnection("");
+			    	  command.manageDisconnection("");
 			    	  break;
 			      }
 			     }catch (IOException e) {
-			       command.ManageDisconnection("");
+			       command.manageDisconnection("");
 			       break;
 			     }
 			}
@@ -110,7 +112,7 @@ class ClientWorker implements Runnable {
 			System.out.println("il client si è disconnesso");
 		
 		} catch (IOException e1) {
-			command.ManageDisconnection("");
+			command.manageDisconnection("");
 			clientMan.stopListening();
 		}
 	  

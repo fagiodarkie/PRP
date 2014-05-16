@@ -2,7 +2,7 @@ package it.unipr.informatica.reti.PRP.interfaces;
 
 import java.net.InetAddress;
 
-public interface NodeInformation {
+public interface UserInformationsInterface {
 
 	/**
 	 * Basic informations for a node:
@@ -17,6 +17,6 @@ public interface NodeInformation {
 	public abstract int getPort();
 	public abstract InetAddress getAddress();
 	
-	public abstract boolean equals(NodeInformation i);
+	public abstract boolean equals(UserInformationsInterface i);
 	
 }

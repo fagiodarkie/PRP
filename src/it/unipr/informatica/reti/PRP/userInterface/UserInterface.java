@@ -1,4 +1,4 @@
-package it.unipr.informatica.reti.PRP.UserInterface;
+package it.unipr.informatica.reti.PRP.userInterface;
 
 import java.io.BufferedReader;
 import java.io.IOException;

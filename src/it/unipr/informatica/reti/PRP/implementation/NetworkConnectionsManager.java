@@ -3,14 +3,14 @@ package it.unipr.informatica.reti.PRP.implementation;
 import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
 
 import java.util.*;
-public class Connections {
+public class NetworkConnectionsManager {
 
 	//stato interno
 	Hashtable<String, ClientInterface> hashtableNickClient;
 	//end stato interno
 	
 	
-	public Connections()
+	public NetworkConnectionsManager()
 	{
 		hashtableNickClient = new Hashtable<String, ClientInterface>();
 	}
@@ -21,7 +21,7 @@ public class Connections {
 	 * @param 
 	 * @return return false if the nickname is already used
 	 */
-	public boolean addClient(String nick, Client newClient)
+	public boolean addClient(String nick, ClientManager newClient)
 	{
 		if(hashtableNickClient.keySet().contains(nick))
 			return false;
@@ -52,7 +52,7 @@ public class Connections {
 		return hashtableNickClient.remove(nick);
 		
 	}
-	public boolean setCliet(String nick, Client newClient)
+	public boolean setCliet(String nick, ClientManager newClient)
 	{
 		if(!hashtableNickClient.keySet().contains(nick))
 			return false;

@@ -8,41 +8,42 @@ import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.utils.Constants;
 
-public class Client implements ClientInterface{
+public class ClientManager implements ClientInterface{
+	
 	ClientCommunicationManager clientCommunicationManager;
 	String clientNick;
 	int clientPort;
 	InetAddress clientIP;
 	
-	public Client(Socket socket,final Command comandoGestioneMessaggi) throws Exception
+	public ClientManager(Socket socket,final Command comandoGestioneMessaggi) throws Exception
 	{
 		clientCommunicationManager = new ClientCommunicationManager(socket,new Command() {
 			
 			@Override
-			public void ManageMessage(String[] PartsOfMessage)  {
-			 Client.this.clientNick = PartsOfMessage[1];
+			public void manageMessage(String[] PartsOfMessage)  {
+			 ClientManager.this.clientNick = PartsOfMessage[1];
 			 String ConnectionInfo[] = PartsOfMessage[2].split(Constants.ConnectionInfoDivisor);
 			 try {
-				Client.this.clientIP = InetAddress.getByName(ConnectionInfo[0]);
+				ClientManager.this.clientIP = InetAddress.getByName(ConnectionInfo[0]);
 			} catch (UnknownHostException e) {
 				// TODO gestione ip non valido
 				e.printStackTrace();
 			}
-			 Client.this.clientPort = Integer.parseInt(ConnectionInfo[1].replace('\n', ' ').trim());
+			 ClientManager.this.clientPort = Integer.parseInt(ConnectionInfo[1].replace('\n', ' ').trim());
 			 //dopo aver estratto le informazioni per creare il client segnalo più in alto che si è un connesso
 			 //un nuovo client
-			 comandoGestioneMessaggi.ManageMessage(PartsOfMessage);
+			 comandoGestioneMessaggi.manageMessage(PartsOfMessage);
 			}
 			
 			@Override
-			public void ManageMessage(String Message,String Client) {
-				comandoGestioneMessaggi.ManageMessage(Message,Client.this.getNick());
+			public void manageMessage(String Message,String Client) {
+				comandoGestioneMessaggi.manageMessage(Message,ClientManager.this.getNick());
 				
 			}
 			@Override
-			public void ManageDisconnection(String Name) {
+			public void manageDisconnection(String Name) {
 				//propago la disconnessione
-				comandoGestioneMessaggi.ManageDisconnection(Client.this.getNick());
+				comandoGestioneMessaggi.manageDisconnection(ClientManager.this.getNick());
 				
 			}
 		});
@@ -66,8 +67,9 @@ public class Client implements ClientInterface{
 		return this.clientIP;
 	}
 	@Override
-	public Boolean SendMessage(String message)
+	public Boolean sendMessage(String message)
 	{
 		return clientCommunicationManager.SendMessage(message);
 	}
+
 }

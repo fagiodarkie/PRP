@@ -5,7 +5,7 @@ import java.net.Socket;
 import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 
-public class DadClient implements ClientInterface {
+public class ParentClientManager implements ClientInterface {
 
 	//informazioni DAD
 	String serverNick;
@@ -21,14 +21,16 @@ public class DadClient implements ClientInterface {
 	Command command;
 	
 	ClientCommunicationManager serverCommunicationManager ;
-	public DadClient(String Nick,int Port,InetAddress IP,Command command)
+	
+	public ParentClientManager(String Nick,int Port,InetAddress IP,Command command)
 	{
 		this.serverIP = IP;
 		this.serverPort = Port;
 		this.serverNick = Nick;
 		this.command = command;
 	}
-	public boolean Connect() throws Exception
+	
+	public boolean connect() throws Exception
 	{
 		
 		Socket serverSocket = new Socket(serverIP, serverPort);   
@@ -53,7 +55,7 @@ public class DadClient implements ClientInterface {
 		return serverPort;
 	}
 	@Override
-	public Boolean SendMessage(String Message) {
+	public Boolean sendMessage(String Message) {
 		return serverCommunicationManager.SendMessage(Message);
 	}
 

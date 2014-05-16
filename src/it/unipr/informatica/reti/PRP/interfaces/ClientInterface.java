@@ -11,5 +11,5 @@ public interface ClientInterface {
 	public String getNick();
 	public int getPort();
 	public InetAddress getIP();
-	public Boolean SendMessage(String message);
+	public Boolean sendMessage(String message);
 }

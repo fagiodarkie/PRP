@@ -1,8 +1,12 @@
 package it.unipr.informatica.reti.PRP.utils;
 
 public class Constants {
+	
+	/* FIXME WARNING: We can't use fixed ports, as when we'll run it on the same
+		machine the socket won't open!
+	*/
 	/**
-	 * porta a cui si connette il server
+	 * porta a cui si connette il ServerInterface
 	 */
 	public static int PortOfServer = 3333;
 	/**

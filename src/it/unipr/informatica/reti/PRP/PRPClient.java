@@ -1,11 +1,11 @@
 package it.unipr.informatica.reti.PRP;
 
-import it.unipr.informatica.reti.PRP.UserInterface.UserInterface;
-import it.unipr.informatica.reti.PRP.implementation.Connections;
+import it.unipr.informatica.reti.PRP.implementation.NetworkConnectionsManager;
 import it.unipr.informatica.reti.PRP.implementation.ServerComponent;
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
 import it.unipr.informatica.reti.PRP.interfaces.UserInterfaceCommandManager;
-import it.unipr.informatica.reti.PRP.interfaces.clientCommunicationManagerInterface;
+import it.unipr.informatica.reti.PRP.interfaces.ClientCommunicationManagerInterface;
+import it.unipr.informatica.reti.PRP.userInterface.UserInterface;
 
 public class PRPClient {
 
@@ -13,7 +13,7 @@ public class PRPClient {
 	
 		
 	TableManager tableManager = new TableManager();
-	Connections connections = new Connections();
+	NetworkConnectionsManager connections = new NetworkConnectionsManager();
 		
 	//STEP 1 CREATE AND INITIALIZE USER INTERFACE
 		
@@ -28,7 +28,7 @@ public class PRPClient {
 	//STEP 2 READ DATA AND CONNECT TO DAD
 		
 	//STEP 3 CREATE SERVER LISTENER
-		ServerComponent serverComponent = new ServerComponent(tableManager,connections, new clientCommunicationManagerInterface() {
+		ServerComponent serverComponent = new ServerComponent(tableManager,connections, new ClientCommunicationManagerInterface() {
 			
 			@Override
 			public Boolean SendMessage(String Message) {
@@ -37,7 +37,7 @@ public class PRPClient {
 			}
 		});
 	
-	//faccio partire il server:
+	//faccio partire il ServerInterface:
 		serverComponent.start();
 	}
 	
