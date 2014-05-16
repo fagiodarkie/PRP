@@ -89,7 +89,7 @@ public class ServerComponent implements ServerInterface {
 							connections.removeClient(nick);
 						}
 						//aggiorno la tabella delle interfacce
-						tableManager.disconnected(nick);
+						tableManager.hasDisconnected(nick);
 						//invio all'interfaccia utente il comando di stampare il messaggio che l'utente si è disconnesso
 						commandClientCommunicationManagerInterface.SendMessage(nick+" is disconnected");
 						
@@ -97,7 +97,7 @@ public class ServerComponent implements ServerInterface {
 					
 				});
 				connections.addClient(c.getNick(),c);
-				tableManager.isNowReachedBy(c.getNick(), c.getNick());
+				tableManager.notifyIsReachedBy(c.getNick(), c.getNick());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

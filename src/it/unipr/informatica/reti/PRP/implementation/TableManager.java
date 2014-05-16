@@ -1,6 +1,8 @@
 package it.unipr.informatica.reti.PRP.implementation;
 
+import java.util.LinkedList;
 import java.util.List;
+
 import it.unipr.informatica.reti.PRP.interfaces.NetworkTableInterface;
 import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
 
@@ -65,7 +67,7 @@ public class TableManager implements NetworkTableInterface {
 	 * @returns true if the nick is still within reach of the network.
 	 * This may be inaccurate due to delays in information propagation.
 	 */
-	public boolean isConnected(String nick) {
+	public boolean isItConnected(String nick) {
 		for (int i = 0; i < howToReach.size(); ++i)
 			if (howToReach.get(i).getReachable().getNick().equals(nick))
 				return true;
@@ -95,10 +97,10 @@ public class TableManager implements NetworkTableInterface {
 	 * regarding the node which can reach the user. If the requested
 	 * user cannot be reached, null is returned.
 	 */
-	public UserInformationsInterface howToReach(String nick) {
+	public String howToReach(String nick) {
 		for (int i = 0; i < howToReach.size(); ++i)
 			if (howToReach.get(i).getReachable().getNick().equals(nick)) {
-				return howToReach.get(i).getInterface();
+				return howToReach.get(i).getInterface().getNick();
 			}
 		return null;
 	}
@@ -113,7 +115,7 @@ public class TableManager implements NetworkTableInterface {
 	 * @param newInterface the UserInformationsInterface structure holding the informations
 	 * regarding the new interface by which the node may be reached.
 	 */
-	public void isNowReachedBy(UserInformationsInterface reached,
+	public void notifyIsReachedBy(UserInformationsInterface reached,
 			UserInformationsInterface newInterface) {
 		boolean existed = false;
 		for (int i = 0; i < howToReach.size(); ++i)
@@ -134,10 +136,10 @@ public class TableManager implements NetworkTableInterface {
 	 * @param reached the marhsalled UserInformationsInterface of the user which can be reached by a new interface.
 	 * @param newInterface the marshalled UserInformationsInterface of the user by which the node may be reached.
 	 */
-	public void isNowReachedBy(String reached, String newInterface) {
+	public void notifyIsReachedBy(String reached, String newInterface) {
 		UserInformationsInterface reachedNode = new UserInformations(reached);
 		UserInformationsInterface howToReachIt = new UserInformations(newInterface);
-		isNowReachedBy(reachedNode, howToReachIt);
+		notifyIsReachedBy(reachedNode, howToReachIt);
 		
 	}
 
@@ -148,7 +150,7 @@ public class TableManager implements NetworkTableInterface {
 	 * 
 	 * @param nick the nickname of the user who disconnected.
 	 */
-	public void disconnected(String nick) {
+	public void hasDisconnected(String nick) {
 		for (int i = 0; i < howToReach.size(); ++i) {
 			if (howToReach.get(i).getReachable().getNick().equals(nick)) 
 				howToReach.remove(i);
@@ -171,6 +173,15 @@ public class TableManager implements NetworkTableInterface {
 			if (howToReach.get(i).getInterface().getNick().equals(nick))
 				return true;
 		return false;
+	}
+
+	@Override
+	public List<String> getConnectedNodes() {
+		List<String> result = new LinkedList<String>();
+		for (int i = 0; i < howToReach.size(); ++i) {
+			result.add(howToReach.get(i).getReachable().getNick());
+		}
+		return result;
 	}
 
 	

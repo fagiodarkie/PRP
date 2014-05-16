@@ -1,17 +1,19 @@
 package it.unipr.informatica.reti.PRP.interfaces;
 
+import java.util.List;
+
 public interface NetworkTableInterface {
 
 	/**
 	 * Module for network managing: know whether a nick is connected and how to reach him.
 	 * Also notify user connection and disconnection. 
 	 */
-	public abstract boolean isConnected(String nick);
-	public abstract UserInformationsInterface getInfoByNick(String nick);
-	public abstract UserInformationsInterface howToReach(String nick);
-	public abstract void isNowReachedBy(UserInformationsInterface reached, UserInformationsInterface newInterface);
-	public abstract void isNowReachedBy(String reached, String newInterface);
-	public abstract void disconnected(String nick);
-	public abstract boolean isNearMe(String nick);
-	
+	public boolean isItConnected(String nick);
+	public UserInformationsInterface getInfoByNick(String nick);
+	public String howToReach(String nick);
+	public void notifyIsReachedBy(UserInformationsInterface reached, UserInformationsInterface newInterface);
+	public void notifyIsReachedBy(String reached, String newInterface);
+	public void hasDisconnected(String nick);
+	public boolean isNearMe(String nick);
+	public List<String> getConnectedNodes();
 }
