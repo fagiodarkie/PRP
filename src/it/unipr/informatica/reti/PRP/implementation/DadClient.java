@@ -7,10 +7,19 @@ import it.unipr.informatica.reti.PRP.interfaces.Command;
 
 public class DadClient implements ClientInterface {
 
+	//informazioni DAD
 	String serverNick;
 	int serverPort;
 	InetAddress serverIP;
+	
+	
+	//informazioni BACKUP
+	String backupNick;
+	int backupPort;
+	InetAddress backupIP;
+	
 	Command command;
+	
 	ClientCommunicationManager serverCommunicationManager ;
 	public DadClient(String Nick,int Port,InetAddress IP,Command command)
 	{

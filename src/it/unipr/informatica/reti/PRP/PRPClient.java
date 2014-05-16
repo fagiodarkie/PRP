@@ -22,7 +22,6 @@ public class PRPClient {
 			@Override
 			public void ManageInput(String Message) {
 				// TODO Auto-generated method stub
-				
 			}
 		});
 		
