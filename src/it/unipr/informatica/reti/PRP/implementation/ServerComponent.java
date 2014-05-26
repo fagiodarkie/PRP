@@ -2,12 +2,14 @@ package it.unipr.informatica.reti.PRP.implementation;
 
 import java.io.*;
 import java.net.*;
+import java.text.MessageFormat;
+import java.util.List;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.interfaces.ClientCommunicationManagerInterface;
-import it.unipr.informatica.reti.PRP.interfaces.MessageCode;
 import it.unipr.informatica.reti.PRP.interfaces.ServerInterface;
 import it.unipr.informatica.reti.PRP.utils.Constants;
+import it.unipr.informatica.reti.PRP.utils.MessageFormatter;
 
 //START SERVER CLASS
 public class ServerComponent implements ServerInterface {
@@ -60,22 +62,61 @@ public class ServerComponent implements ServerInterface {
 						//STEP 2 controllo che genere di messaggio e' e lo gestisco
 						switch(messageManagement.getCode())
 						{
-						case MessageCode.HELLO:  
-							//TODO GESTIONE ARRIVO HELLO
+						case Constants.MessageHelloCode :
+							//DO NOTHING
+							
 							break;
 						case Constants.MessageBroadcastCode :
-
-							//TODO IMPLEMENT BROADCAST;
+							
+							for(String nick : tableManager.allMyNeighbors())
+							{
+								if(nick != Client)
+								{
+									connections.getClient(nick).sendMessage(Message);
+								}
+							}
 							
 							break;
 						case Constants.MessageBackupNickCode:
 							//TODO gestione nick backup
 							break;
 						case Constants.MessageReachableCode :
-							//TODO GESTIONE ARRIVO MESSAGGIO REACHABLE 
+							//TODO controllare get data di POJOMessage
+							
+							if(!tableManager.isItConnected(messageManagement.getData()))
+							{
+							
+								String isReachableMessage = MessageFormatter.GenerateReachableMessage(messageManagement.getData());
+								for(String nick : tableManager.allMyNeighbors())
+								{
+									if(nick != Client)
+									{
+										connections.getClient(nick).sendMessage(isReachableMessage);
+									}
+								}
+							}
+							else
+							{
+								//DO NOTHING 
+							}
 							break;
 						case Constants.MessageNotReachableCode :
-							//TODO GESTIONE ARRIVO MESSAGGIO NOTREACHABLE 
+							if(tableManager.isItConnected(messageManagement.getData()))
+							{
+							
+								String isNotReachableMessage = MessageFormatter.GenerateNotReachableMessage(messageManagement.getData());
+								for(String nick : tableManager.allMyNeighbors())
+								{
+									if(nick != Client)
+									{
+										connections.getClient(nick).sendMessage(isNotReachableMessage);
+									}
+								}
+							}
+							else
+							{
+								//DO NOTHING 
+							} 
 							
 							break;
 						case Constants.MessageTableCode:
@@ -101,6 +142,20 @@ public class ServerComponent implements ServerInterface {
 				});
 				connections.addClient(c.getNick(),c);
 				tableManager.notifyIsReachedBy(c.getNick(), c.getNick());
+				
+				//ottengo tutti i nodi raggiungibili da me
+				List<String> nodi = tableManager.allMyNeighbors();
+				
+				//genero il messaggio per aggiornare tutti gli altri
+				String isReachableMessage = MessageFormatter.GenerateReachableMessage(c.getNick());
+				for ( String nodo : nodi)
+				{
+					if(connections.getClient(nodo).getNick() != c.getNick())
+					{
+						connections.getClient(nodo).sendMessage(isReachableMessage);
+					}
+				}
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
