@@ -11,6 +11,6 @@ public abstract interface MessageInterface {
 	public abstract String getSender();
 	public abstract String getReceiver();
 	public abstract Timestamp getTimestamp();
-	public abstract MessageCode getCode();
+	public abstract String getCode();
 	public abstract String getData();
 }

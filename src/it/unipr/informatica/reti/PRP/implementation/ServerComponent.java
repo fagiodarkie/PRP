@@ -5,6 +5,7 @@ import java.net.*;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.interfaces.ClientCommunicationManagerInterface;
+import it.unipr.informatica.reti.PRP.interfaces.MessageCode;
 import it.unipr.informatica.reti.PRP.interfaces.ServerInterface;
 import it.unipr.informatica.reti.PRP.utils.Constants;
 
@@ -51,13 +52,15 @@ public class ServerComponent implements ServerInterface {
 					@Override
 					public void manageMessage(String Message,String Client) {
 						
-						//STEP 1 scompongo il messaggio
-						String partsOfMessage[] = Message.split(Constants.MessagePartsDivisor);
+						
+						POJOMessage messageManagement = new POJOMessage(Message);
+						
+						
 						
 						//STEP 2 controllo che genere di messaggio e' e lo gestisco
-						switch(partsOfMessage[0])
+						switch(messageManagement.getCode())
 						{
-						case Constants.MessageHelloCode :
+						case MessageCode.HELLO:  
 							//TODO GESTIONE ARRIVO HELLO
 							break;
 						case Constants.MessageBroadcastCode :

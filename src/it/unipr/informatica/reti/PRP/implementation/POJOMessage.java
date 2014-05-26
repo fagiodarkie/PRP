@@ -4,10 +4,14 @@ import java.security.Timestamp;
 
 import it.unipr.informatica.reti.PRP.interfaces.MessageCode;
 import it.unipr.informatica.reti.PRP.interfaces.MessageInterface;
+import it.unipr.informatica.reti.PRP.utils.Constants;
 
 public class POJOMessage implements MessageInterface {
 
-	// TODO FAGIO
+	private String code;
+	private String sender;
+	private String receiver;
+	private String data;
 
 	/**
 	 * Message implementation: informations about
@@ -19,13 +23,40 @@ public class POJOMessage implements MessageInterface {
 	 * are provided.
 	 */
 	
+	public POJOMessage()
+	{
+		code = "";
+		sender = "";
+		receiver = "";
+		data = "";
+		
+	}
+	public POJOMessage(String Message){
+		
+		this();
+		
+		String partsOfMessaggio[] = Message.split(Constants.MessagePartsDivisor);
+		
+		switch ( partsOfMessaggio.length )
+		{
+		case 4:
+				data = partsOfMessaggio[3];
+		case 3:
+				receiver = partsOfMessaggio[2];
+		case 2:
+				sender = partsOfMessaggio[1];
+		case 1:
+				code = partsOfMessaggio[0];
+		
+		}
+	}
+	
 	/**
 	 * @return the sender nickname, if any.
 	 */
 	@Override
 	public String getSender() {
-		// TODO Auto-generated method stub
-		return null;
+		return sender;
 	}
 
 	/**
@@ -33,8 +64,7 @@ public class POJOMessage implements MessageInterface {
 	 */
 	@Override
 	public String getReceiver() {
-		// TODO Auto-generated method stub
-		return null;
+		return receiver;
 	}
 
 	/**
@@ -50,9 +80,8 @@ public class POJOMessage implements MessageInterface {
 	 * @return the message type, as enum.
 	 */
 	@Override
-	public MessageCode getCode() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getCode() {
+		return code;
 	}
 
 	/**
@@ -64,8 +93,7 @@ public class POJOMessage implements MessageInterface {
 	 */
 	@Override
 	public String getData() {
-		// TODO Auto-generated method stub
-		return null;
+		return data;
 	}
 
 	
