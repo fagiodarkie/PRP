@@ -16,4 +16,5 @@ public interface NetworkTableInterface {
 	public void hasDisconnected(String nick);
 	public boolean isNearMe(String nick);
 	public List<String> getConnectedNodes();
+	public List<String> allMyNeighbors();
 }

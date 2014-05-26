@@ -142,6 +142,17 @@ public class TableManager implements NetworkTableInterface {
 		notifyIsReachedBy(reachedNode, howToReachIt);
 		
 	}
+	
+	@Override
+	public List<String> allMyNeighbors() {
+		List<String> result = new LinkedList<String>();
+		for (int i = 0; i < howToReach.size(); ++i) {
+			String current = howToReach.get(i).getInterface().getNick();
+			if (!result.contains((String)current) )
+				result.add(current);
+			}
+		return result;
+	}
 
 	@Override
 	/**
