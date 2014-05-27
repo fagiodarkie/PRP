@@ -54,4 +54,8 @@ public class Constants {
 	 */
 	public final static String MessageTableCode = "7";
 	
+	public final static String PathOfTableBackupFile ="";
+	public final static String NameOfTableBackupFile ="table.txt";
+	public final static String FileBackupInformationDivisor=":-:";
+	
 }
