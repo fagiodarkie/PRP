@@ -8,6 +8,7 @@ import java.util.List;
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.interfaces.ClientCommunicationManagerInterface;
 import it.unipr.informatica.reti.PRP.interfaces.ServerInterface;
+import it.unipr.informatica.reti.PRP.interfaces.UserInterfaceCommandManager;
 import it.unipr.informatica.reti.PRP.utils.Constants;
 import it.unipr.informatica.reti.PRP.utils.MessageFormatter;
 
@@ -62,66 +63,78 @@ public class ServerComponent implements ServerInterface {
 						//STEP 2 controllo che genere di messaggio e' e lo gestisco
 						switch(messageManagement.getCode())
 						{
-						case Constants.MessageHelloCode :
-							//DO NOTHING
-							
-							break;
-						case Constants.MessageBroadcastCode :
-							
-							for(String nick : tableManager.allMyNeighbors())
-							{
-								if(nick != Client)
+/*messaggio HELLO       */	case Constants.MessageHelloCode :
+								//DO NOTHING
+								break;
+/*messaggio POINT TO POINT*/case Constants.MessagePointToPointCode:
+								if(!tableManager.isItConnected(messageManagement.getReceiver()))
 								{
-									connections.getClient(nick).sendMessage(Message);
+									//allora sono io
+									//TODO aggiornare l'interfaccia grafica con il nuovo messaggio ricevuto
 								}
-							}
+								else
+								{
+									//lo devo mandare sulla linea corretta
+									connections.sendMesage(tableManager.howToReach(messageManagement.getReceiver()), Message);
+								}
+								break;
 							
-							break;
-						case Constants.MessageBackupNickCode:
-							//TODO gestione nick backup
-							break;
-						case Constants.MessageReachableCode :
-							//TODO controllare get data di POJOMessage
+/*messaggio BROADCAST     */case Constants.MessageBroadcastCode :
 							
-							if(!tableManager.isItConnected(messageManagement.getData()))
-							{
-							
-								String isReachableMessage = MessageFormatter.GenerateReachableMessage(messageManagement.getData());
 								for(String nick : tableManager.allMyNeighbors())
 								{
 									if(nick != Client)
 									{
-										connections.getClient(nick).sendMessage(isReachableMessage);
+										connections.getClient(nick).sendMessage(Message);
 									}
 								}
-							}
-							else
-							{
-								//DO NOTHING 
-							}
-							break;
-						case Constants.MessageNotReachableCode :
-							if(tableManager.isItConnected(messageManagement.getData()))
-							{
-							
-								String isNotReachableMessage = MessageFormatter.GenerateNotReachableMessage(messageManagement.getData());
-								for(String nick : tableManager.allMyNeighbors())
+								
+								break;
+/*messaggio BACKUP NICK   */case Constants.MessageBackupNickCode:
+								 //DO NOTHING ONLY PARENT CAN SEND BACKUP NICK
+								break;
+/*messaggio REACHABLE     */case Constants.MessageReachableCode :
+								//TODO controllare get data di POJOMessage
+								
+								if(!tableManager.isItConnected(messageManagement.getData()))
 								{
-									if(nick != Client)
+								
+									String isReachableMessage = MessageFormatter.GenerateReachableMessage(messageManagement.getData());
+									for(String nick : tableManager.allMyNeighbors())
 									{
-										connections.getClient(nick).sendMessage(isNotReachableMessage);
+										if(nick != Client)
+										{
+											connections.getClient(nick).sendMessage(isReachableMessage);
+										}
 									}
 								}
-							}
-							else
-							{
-								//DO NOTHING 
-							} 
-							
-							break;
-						case Constants.MessageTableCode:
-							//TODO GESTIONE ARRIVO MESSAGGIO TABLE
-							break;
+								else
+								{
+									//DO NOTHING 
+								}
+								break;
+/*messaggio NOT REACHABLE */case Constants.MessageNotReachableCode :
+								if(tableManager.isItConnected(messageManagement.getData()))
+								{
+								
+									String isNotReachableMessage = MessageFormatter.GenerateNotReachableMessage(messageManagement.getData());
+									for(String nick : tableManager.allMyNeighbors())
+									{
+										if(nick != Client)
+										{
+											connections.getClient(nick).sendMessage(isNotReachableMessage);
+										}
+									}
+								}
+								else
+								{
+									//DO NOTHING 
+								} 
+								
+								break;
+/*messaggio TABLE   */      case Constants.MessageTableCode:
+								//TODO manage backuptable
+								break;
 						
 						}
 						

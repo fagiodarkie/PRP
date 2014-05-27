@@ -49,7 +49,7 @@ public class NetworkConnectionsManager {
 		if(!hashtableNickClient.keySet().contains(nick))
 			return null;
 		
-		return hashtableNickClient.remove(nick);
+		return hashtableNickClient.get(nick);
 		
 	}
 	public boolean setCliet(String nick, ClientManager newClient)
@@ -59,6 +59,17 @@ public class NetworkConnectionsManager {
 		
 		//TODO SETCLIENT
 		return true;
+	}
+	
+	public boolean sendMesage(String nick, String Message)
+	{
+		if(!hashtableNickClient.keySet().contains(nick))
+			return false;
+		else
+		{
+			((ClientInterface)(hashtableNickClient.get(nick))).sendMessage(Message);
+			return true;
+		}
 	}
 
 }

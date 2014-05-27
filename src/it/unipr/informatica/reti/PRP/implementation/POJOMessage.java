@@ -34,20 +34,26 @@ public class POJOMessage implements MessageInterface {
 	public POJOMessage(String Message){
 		
 		this();
-		
 		String partsOfMessaggio[] = Message.split(Constants.MessagePartsDivisor);
 		
 		switch ( partsOfMessaggio.length )
 		{
-		case 4:
-				data = partsOfMessaggio[3];
-		case 3:
-				receiver = partsOfMessaggio[2];
-		case 2:
-				sender = partsOfMessaggio[1];
-		case 1:
-				code = partsOfMessaggio[0];
 		
+			case 4:
+					code = partsOfMessaggio[0];
+					sender = partsOfMessaggio[1];
+					receiver = partsOfMessaggio[2];
+					data = partsOfMessaggio[3];
+					break;
+			case 3:
+					code = partsOfMessaggio[0];
+					sender = partsOfMessaggio[1];
+					data = partsOfMessaggio[2];
+					break;
+			case 2:
+				code = partsOfMessaggio[0];
+				data = partsOfMessaggio[1];
+				break;
 		}
 	}
 	
