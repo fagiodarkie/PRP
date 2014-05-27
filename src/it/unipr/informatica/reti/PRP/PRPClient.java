@@ -10,28 +10,28 @@ import it.unipr.informatica.reti.PRP.userInterface.UserInterface;
 
 public class PRPClient {
 
+	
 	public static void main(String args[]) {
 	
 		
+		
+
 	TableManager tableManager = new TableManager();
 	NetworkConnectionsManager connections = new NetworkConnectionsManager();
-		
+	
+		final String Nick;
 	//STEP 1 CREATE AND INITIALIZE USER INTERFACE
 		
-		final UserInterface userInterface = new UserInterface(new UserInterfaceCommandManager() {
-			
-			@Override
-			public void ManageInput(String Message) {
-				// TODO Auto-generated method stub
-			}
-		});
+		final UserInterface userInterface = new UserInterface();
+		
+		Nick = userInterface.getNick();
 		
 	//STEP 2 READ DATA AND CONNECT TO DAD
 		//TODO IMPLEMENT READING DATA FROM BACKUP FILE
 		//TODO IMPLEMENT CONNECTION TO DAD
 		//TODO ADD DAD TO CONNECTIONS
 	//STEP 3 CREATE SERVER LISTENER
-		ServerComponent serverComponent = new ServerComponent(tableManager,connections, new ClientCommunicationManagerInterface() {
+		final ServerComponent serverComponent = new ServerComponent(tableManager,connections, new ClientCommunicationManagerInterface() {
 			
 			@Override
 			public Boolean SendMessage(String Message) {
@@ -39,9 +39,26 @@ public class PRPClient {
 				return null;
 			}
 		});
-	
+		
+		userInterface.setCommand(new UserInterfaceCommandManager() {
+			
+			@Override
+			public void ManageInput(String Message) {
+				// TODO remove test
+				//TEST
+				//System.out.println(Message);
+				//END TEST
+				serverComponent.ManageMessageFromUserInterface(Message, Nick);
+			}
+		});
+		
+	//faccio partire l'interfaccia grafica
+		userInterface.StartReadingFromInput();
 	//faccio partire il ServerInterface:
 		serverComponent.start();
 	}
+	
+	
+	
 	
 }

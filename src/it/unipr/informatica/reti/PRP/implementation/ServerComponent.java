@@ -191,7 +191,17 @@ public class ServerComponent implements ServerInterface {
 	//END CONNECTION MANAGEMENT METHOD
 	
 	
-	//GESTIONE MESSAGGI
+	//GESTIONE MESSAGGI RICEVUTI DA INTERFACCIA GRAFICA
+	public void ManageMessageFromUserInterface(String Message,String MyNick)
+	{
+		//TODO remove test
+		//TEST
+			System.out.println("messaggio ricevuto dall'interfaccia grafica --> messaggio='"+ Message +"'; nick='"+ MyNick +"'");
+			commandClientCommunicationManagerInterface.SendMessage(Message + " - " + MyNick);
+		//END TEST
+			
+			
+	}
 	}
 //END SERVER CLASS
 

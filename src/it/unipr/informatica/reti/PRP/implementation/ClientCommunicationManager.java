@@ -77,7 +77,7 @@ class ClientWorker implements Runnable {
 		  this.clientMan = clientManager;
 		message = in.readLine();
 		String partsOfMessage[] = message.split(Constants.MessagePartsDivisor);
-		if(partsOfMessage[0].contains("0"))
+		if(partsOfMessage[0].contains(Constants.MessageHelloCode))
 		{
 			comando.manageMessage(partsOfMessage);
 		}
