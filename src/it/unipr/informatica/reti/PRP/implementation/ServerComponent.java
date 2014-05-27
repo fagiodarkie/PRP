@@ -49,7 +49,7 @@ public class ServerComponent implements ServerInterface {
 					
 					@Override
 					public void manageMessage(String[] PartsOfMessage) {
-						//TODO INVIARE A TUTTI IL MESSAGGIO IL REACHABLE
+						/*DO NOTHING*/
 					}
 					
 					@Override
@@ -140,7 +140,7 @@ public class ServerComponent implements ServerInterface {
 						
 					}
 					@Override
-					public void manageDisconnection(String nick) {
+/*DISCONNESSIONE*/  public void manageDisconnection(String nick) {
 						if(tableManager.isNearMe(nick)){
 							//tolgo l'interfaccia con il client
 							connections.removeClient(nick);
@@ -153,7 +153,7 @@ public class ServerComponent implements ServerInterface {
 					}
 					
 				});
-				connections.addClient(c.getNick(),c);
+/*NEW CLIENT*/  connections.addClient(c.getNick(),c);
 				tableManager.notifyIsReachedBy(c.getNick(), c.getNick());
 				
 				//ottengo tutti i nodi raggiungibili da me
@@ -168,7 +168,7 @@ public class ServerComponent implements ServerInterface {
 						connections.getClient(nodo).sendMessage(isReachableMessage);
 					}
 				}
-				
+/*FINE GESTIONE NEW CLIENT*/	
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -185,7 +185,7 @@ public class ServerComponent implements ServerInterface {
 	}
 	@Override
 	public Boolean stop() {
-		// TODO Auto-generated method stub
+		// TODO FINE ASCOLTO
 		return null;
 	}
 	//END CONNECTION MANAGEMENT METHOD

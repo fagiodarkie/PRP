@@ -21,14 +21,15 @@ public class ClientManager implements ClientInterface{
 			
 			@Override
 			public void manageMessage(String[] PartsOfMessage)  {
-			 ClientManager.this.clientNick = PartsOfMessage[1];
+
+				ClientManager.this.clientNick = PartsOfMessage[1];
 			 String ConnectionInfo[] = PartsOfMessage[2].split(Constants.ConnectionInfoDivisor);
 			 try {
 				ClientManager.this.clientIP = InetAddress.getByName(ConnectionInfo[0]);
-			} catch (UnknownHostException e) {
+			 } catch (UnknownHostException e) {
 				// TODO gestione ip non valido
 				e.printStackTrace();
-			}
+			 }
 			 ClientManager.this.clientPort = Integer.parseInt(ConnectionInfo[1].replace('\n', ' ').trim());
 			 //dopo aver estratto le informazioni per creare il client segnalo più in alto che si è un connesso
 			 //un nuovo client

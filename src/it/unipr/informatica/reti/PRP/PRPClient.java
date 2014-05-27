@@ -1,6 +1,7 @@
 package it.unipr.informatica.reti.PRP;
 
 import it.unipr.informatica.reti.PRP.implementation.NetworkConnectionsManager;
+import it.unipr.informatica.reti.PRP.implementation.ParentClientManager;
 import it.unipr.informatica.reti.PRP.implementation.ServerComponent;
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
 import it.unipr.informatica.reti.PRP.interfaces.UserInterfaceCommandManager;
@@ -26,7 +27,9 @@ public class PRPClient {
 		});
 		
 	//STEP 2 READ DATA AND CONNECT TO DAD
-		
+		//TODO IMPLEMENT READING DATA FROM BACKUP FILE
+		//TODO IMPLEMENT CONNECTION TO DAD
+		//TODO ADD DAD TO CONNECTIONS
 	//STEP 3 CREATE SERVER LISTENER
 		ServerComponent serverComponent = new ServerComponent(tableManager,connections, new ClientCommunicationManagerInterface() {
 			
