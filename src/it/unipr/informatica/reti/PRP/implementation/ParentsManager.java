@@ -2,12 +2,15 @@ package it.unipr.informatica.reti.PRP.implementation;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.utils.Constants;
+import it.unipr.informatica.reti.PRP.utils.MessageFormatter;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -16,27 +19,128 @@ import java.util.ListIterator;
 public class ParentsManager {
 	
 	ParentClientManager parentClientManager;
-	
-	public void connect(String Nick, int Port, InetAddress IP, Command command, String MyNick, int MyPort, InetAddress MyIp)
+	NetworkConnectionsManager connectionsManager;
+	Command command;
+	public ParentsManager(NetworkConnectionsManager connectionsManager, Command command)
 	{
-		parentClientManager = new ParentClientManager(Nick, Port, IP, MyNick, Integer.toString(MyPort ), MyIp, command, this);
+		this.connectionsManager = connectionsManager;
+		this.command= command;
 	}
-	public void connect(String File, String MyNick, int MyPort, InetAddress MyIp, Command command)
+	public Boolean connect(String Nick, int Port, InetAddress IP, String MyNick, int MyPort, InetAddress MyIp)
 	{
-		List<String> nodi = readTable();
-		for(String nodo : nodi )
+		try
 		{
-			String nodoInfo[] = nodo.split(Constants.FileBackupInformationDivisor);
-			try
-			{
-				this.connect(nodoInfo[0], Integer.parseInt(nodoInfo[1]), InetAddress.getByName(nodoInfo[2]), command, MyNick, MyPort, MyIp);
-				break;
+		parentClientManager = new ParentClientManager(Nick, Port, IP, MyNick, Integer.toString(MyPort ), MyIp, new Command() {
+			
+			@Override
+			public void manageMessage(String[] PartsOfMessage) {
+				//propago il messaggio ricevuto
+				command.manageMessage(PartsOfMessage);
+				
 			}
-			catch(Exception e)
-			{}
+			
+			@Override
+			public void manageMessage(String Message, String Client) {
+				//propago il messaggio ricevuto
+				command.manageMessage(Message, Client);
+				
+			}
+			
+			@Override
+			public void manageDisconnection(String Name) {
+				//per prima cosa propago il messaggio 
+				command.manageDisconnection(Name);
+				//successivamente mi connetto al nodo di backup
+				try
+				{
+					riconnetti();
+				}
+				catch(Exception e)
+				{
+					//TODO gestire errore in caso nodo backup non sia connesso
+				}
+				
+			}
+		}, this);
+		}catch (Exception ex)
+		{
+			return false;
 		}
+		//avviso che il genitore è raggiungibile tramite me
+		command.manageMessage(MessageFormatter.GenerateReachableMessage(parentClientManager.getNick()), parentClientManager.MyNick);
+		connectionsManager.addClient(parentClientManager.getNick(),parentClientManager);
+		return true;
+	}
+	
+	/**
+	 * prova a connettersi a tutti i nodi presenti nel file di backup e il primo disponibile lo utilizza come padre
+	 * @param File
+	 * @param MyNick
+	 * @param MyPort
+	 * @param MyIp
+	 * @throws UnknownHostException 
+	 * @throws NumberFormatException 
+	 */
+	public Boolean connect(String File, String MyNick, int MyPort, InetAddress MyIp)
+	{
+		File f = new File(File);
+		if(f.exists() && !f.isDirectory()) { 
+			
+			List<String> nodi = readTable();
+			
+			if(nodi.size() == 0)
+				//se non sono presenti informazioni riguardanti i nodi restituisco false;
+				return false;
+			for(String nodo : nodi )
+			{
+				String nodoInfo[] = nodo.split(Constants.FileBackupInformationDivisor);
+				InetAddress address;
+				//provo a convertire il valore che ho nel file nell'indirizzo dell'host
+				try
+				{
+					address = InetAddress.getByName(nodoInfo[2]);
+				}
+				catch(NumberFormatException ex)
+				{
+					//il file non è formattato correttamente
+					return false;
+				} 
+				catch (UnknownHostException e) {
+					return false;
+				}
+				
+				if (this.connect(nodoInfo[0], Integer.parseInt(nodoInfo[1]), address ,  MyNick, MyPort, MyIp))
+				{
+					connectionsManager.addClient(parentClientManager.getNick(),parentClientManager);
+					return true;
+				}
+				
+			}
+		}
+		//se arrivo a questo punto o il file non è presente o non sono riuscito a connettermi a nessun file 
+		//allora non ho modo di connettermi a nessun server allora restituisco false
+		return false;
 		
 	}
+	
+	
+	public void riconnetti()
+	{
+		//mi salvo le informazioni riguardanti il nodo di backup
+		int port = parentClientManager.backupPort;
+		String nick = parentClientManager.backupNick;
+		InetAddress IP = parentClientManager.backupIP;
+		String Myport = parentClientManager.MyPort;
+		String Mynick = parentClientManager.MyNick;
+		InetAddress MyIP = parentClientManager.MyIP;
+		//riconnetto il padre
+		this.connect(nick, port, IP,  Mynick,Integer.parseInt(Myport), MyIP);
+	}
+	
+	/**
+	 * legge da file le informazioni riguardanti i client noti salvate nella sessione precedente
+	 * @return restituisce una lista di stringhe contenenti le informazioni dei client
+	 */
 	static private List<String> readTable()
 	{
 		List<String> informations = new List<String>() {

@@ -21,7 +21,7 @@ public class NetworkConnectionsManager {
 	 * @param 
 	 * @return return false if the nickname is already used
 	 */
-	public boolean addClient(String nick, ClientManager newClient)
+	public boolean addClient(String nick, ClientInterface newClient)
 	{
 		if(hashtableNickClient.keySet().contains(nick))
 			return false;
@@ -51,14 +51,6 @@ public class NetworkConnectionsManager {
 		
 		return hashtableNickClient.get(nick);
 		
-	}
-	public boolean setCliet(String nick, ClientManager newClient)
-	{
-		if(!hashtableNickClient.keySet().contains(nick))
-			return false;
-		
-		//TODO SETCLIENT
-		return true;
 	}
 	
 	public boolean sendMesage(String nick, String Message)

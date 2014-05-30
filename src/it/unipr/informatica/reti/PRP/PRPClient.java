@@ -2,6 +2,8 @@ package it.unipr.informatica.reti.PRP;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.sql.Savepoint;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +30,7 @@ public class PRPClient {
 
 	static TableManager tableManager ;
 	static NetworkConnectionsManager connections ;
-	public static void main(String args[]) {
+	public static void main(String args[]) throws UnknownHostException {
 	
 		
 		
@@ -37,17 +39,13 @@ public class PRPClient {
 	connections = new NetworkConnectionsManager();
 	
 		final String Nick;
-	//STEP 1 CREATE AND INITIALIZE USER INTERFACE
+	//CREATE AND INITIALIZE USER INTERFACE
 		
 		final UserInterface userInterface = new UserInterface();
 		
 		Nick = userInterface.getNick();
 		
-	//STEP 2 READ DATA AND CONNECT TO DAD
-		//TODO IMPLEMENT READING DATA FROM BACKUP FILE
-		//TODO IMPLEMENT CONNECTION TO DAD
-		//TODO ADD DAD TO CONNECTIONS
-	//STEP 3 CREATE SERVER LISTENER
+	//CREATE SERVER LISTENER
 		final ServerComponent serverComponent = new ServerComponent(tableManager,connections, new ClientCommunicationManagerInterface() {
 			
 			@Override
@@ -61,24 +59,59 @@ public class PRPClient {
 			
 			@Override
 			public void ManageInput(String Message) {
-				// TODO remove test
-				//TEST
-				//System.out.println(Message);
-				//END TEST
+				if(Message.toUpperCase() == "EXIT")
+				{
+					//prima di uscire salvo i dati dei nodi che conosco
+					SaveTable();
+					
+					//successivamente termino il programma
+					System.exit(0);
+				}
+				else
 				serverComponent.ManageMessageFromUserInterface(Message, Nick);
 			}
 		});
 		
-		ParentsManager parentsManager = new ParentsManager();
+		//creo il componente che gestirà (e ricollegherà in caso d'errore) il padre
+		ParentsManager parentsManager = new ParentsManager(connections,new Command() {
+			
+			@Override
+			public void manageMessage(String[] PartsOfMessage) {
+				//DO NOTHING 
+				
+			}
+			
+			@Override
+			public void manageMessage(String Message, String Client) {
+				//giro il messaggio al server in modo che lo gestisca
+				serverComponent.ManageMessage(Message, Client);
+			}
+			
+			@Override
+			public void manageDisconnection(String Name) {
+				//giro il messaggio al  server
+				serverComponent.ManageDisconnection(Name);
+			}
+		});
+
+		//comando al gestore di cercare un nodo lilbero tra quelli salvati precedentemente al quale connettermi
+		parentsManager.connect(Constants.PathOfTableBackupFile + "//" + Constants.NameOfTableBackupFile, //path del file di backup della tabella
+								Nick, //mio nick con cui autenticarmi
+								Constants.PortOfServer, //porta a cui far autenticare il server 
+								InetAddress.getByName("127.0.0.1") //mio ip
+								);
 		
-	//faccio partire l'interfaccia grafica
+	
+		//faccio partire l'interfaccia grafica
 		userInterface.StartReadingFromInput();
-	//faccio partire il ServerInterface:
+		
+		
+		//faccio partire il ServerInterface:
 		serverComponent.start();
 	}
 	
 	
-	private void SaveTable()
+	public static void SaveTable()
 	{
 
 		List<String> listaNick = tableManager.getConnectedNodes();
