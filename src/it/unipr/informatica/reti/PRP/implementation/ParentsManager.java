@@ -20,11 +20,13 @@ public class ParentsManager {
 	
 	ParentClientManager parentClientManager;
 	NetworkConnectionsManager connectionsManager;
+	TableManager tableManager;
 	Command command;
-	public ParentsManager(NetworkConnectionsManager connectionsManager, Command command)
+	public ParentsManager(NetworkConnectionsManager connectionsManager,TableManager tableManager, Command command)
 	{
 		this.connectionsManager = connectionsManager;
 		this.command= command;
+		this.tableManager = tableManager;
 	}
 	public Boolean connect(String Nick, int Port, InetAddress IP, String MyNick, int MyPort, InetAddress MyIp)
 	{
@@ -57,7 +59,7 @@ public class ParentsManager {
 				}
 				catch(Exception e)
 				{
-					//TODO gestire errore in caso nodo backup non sia connesso
+					//DO NOTHING in this case we lost the server's slice of network 
 				}
 				
 			}
@@ -68,6 +70,7 @@ public class ParentsManager {
 		}
 		//avviso che il genitore è raggiungibile tramite me
 		command.manageMessage(MessageFormatter.GenerateReachableMessage(parentClientManager.getNick()), parentClientManager.MyNick);
+		tableManager.notifyIsReachedBy(parentClientManager.getNick(), parentClientManager.getNick());
 		connectionsManager.addClient(parentClientManager.getNick(),parentClientManager);
 		return true;
 	}
@@ -147,139 +150,116 @@ public class ParentsManager {
 			
 			@Override
 			public <T> T[] toArray(T[] a) {
-				// TODO Auto-generated method stub
 				return null;
 			}
 			
 			@Override
 			public Object[] toArray() {
-				// TODO Auto-generated method stub
 				return null;
 			}
 			
 			@Override
 			public List<String> subList(int fromIndex, int toIndex) {
-				// TODO Auto-generated method stub
 				return null;
 			}
 			
 			@Override
 			public int size() {
-				// TODO Auto-generated method stub
 				return 0;
 			}
 			
 			@Override
 			public String set(int index, String element) {
-				// TODO Auto-generated method stub
 				return null;
 			}
 			
 			@Override
 			public boolean retainAll(Collection<?> c) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 			
 			@Override
 			public boolean removeAll(Collection<?> c) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 			
 			@Override
 			public String remove(int index) {
-				// TODO Auto-generated method stub
 				return null;
 			}
 			
 			@Override
 			public boolean remove(Object o) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 			
 			@Override
 			public ListIterator<String> listIterator(int index) {
-				// TODO Auto-generated method stub
 				return null;
 			}
 			
 			@Override
 			public ListIterator<String> listIterator() {
-				// TODO Auto-generated method stub
 				return null;
 			}
 			
 			@Override
 			public int lastIndexOf(Object o) {
-				// TODO Auto-generated method stub
 				return 0;
 			}
 			
 			@Override
 			public Iterator<String> iterator() {
-				// TODO Auto-generated method stub
 				return null;
 			}
 			
 			@Override
 			public boolean isEmpty() {
-				// TODO Auto-generated method stub
 				return false;
 			}
 			
 			@Override
 			public int indexOf(Object o) {
-				// TODO Auto-generated method stub
 				return 0;
 			}
 			
 			@Override
 			public String get(int index) {
-				// TODO Auto-generated method stub
 				return null;
 			}
 			
 			@Override
 			public boolean containsAll(Collection<?> c) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 			
 			@Override
 			public boolean contains(Object o) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 			
 			@Override
 			public void clear() {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public boolean addAll(int index, Collection<? extends String> c) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 			
 			@Override
 			public boolean addAll(Collection<? extends String> c) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 			
 			@Override
 			public void add(int index, String element) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public boolean add(String e) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 		};
@@ -295,10 +275,8 @@ public class ParentsManager {
 			br.close();
 		
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		

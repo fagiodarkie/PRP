@@ -73,7 +73,7 @@ public class PRPClient {
 		});
 		
 		//creo il componente che gestirà (e ricollegherà in caso d'errore) il padre
-		ParentsManager parentsManager = new ParentsManager(connections,new Command() {
+		ParentsManager parentsManager = new ParentsManager(connections,tableManager,new Command() {
 			
 			@Override
 			public void manageMessage(String[] PartsOfMessage) {
@@ -93,14 +93,15 @@ public class PRPClient {
 				serverComponent.ManageDisconnection(Name);
 			}
 		});
-
+		
 		//comando al gestore di cercare un nodo lilbero tra quelli salvati precedentemente al quale connettermi
-		parentsManager.connect(Constants.PathOfTableBackupFile + "//" + Constants.NameOfTableBackupFile, //path del file di backup della tabella
+		if(!parentsManager.connect(Constants.PathOfTableBackupFile + "//" + Constants.NameOfTableBackupFile, //path del file di backup della tabella
 								Nick, //mio nick con cui autenticarmi
 								Constants.PortOfServer, //porta a cui far autenticare il server 
 								InetAddress.getByName("127.0.0.1") //mio ip
-								);
-		
+								))
+			userInterface.PrintMessage("nessun server a cui connettersi quindi questo diventa un server principale");
+			
 	
 		//faccio partire l'interfaccia grafica
 		userInterface.StartReadingFromInput();
