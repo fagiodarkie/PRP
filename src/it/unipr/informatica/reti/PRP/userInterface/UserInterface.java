@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+
 import it.unipr.informatica.reti.PRP.interfaces.UserInterfaceCommandManager;
+import it.unipr.informatica.reti.PRP.utils.Constants;
 
 public class UserInterface {
 
@@ -20,6 +23,39 @@ public class UserInterface {
                 new BufferedReader(new InputStreamReader(System.in));
 		try{
 		Nick = br.readLine();
+		}
+		catch(IOException e)
+		{}
+		System.out.print("utilizzare la porta di defalut \""+Constants.PortOfServer+"\"(y/n):");
+		try
+		{
+			String utilizzoporta = br.readLine();
+			System.out.println(utilizzoporta);
+			if(utilizzoporta.toLowerCase().equals("y")){
+				System.out.println("verra' utilizzata la porta di default");
+			}
+			else if(utilizzoporta.toLowerCase().equals("n")){
+				System.out.print("porta da utilizzare:");
+				String port = br.readLine();
+				try
+				{
+					Constants.PortOfServer = Integer.parseInt(port);
+				}
+				catch(NumberFormatException e)
+				{
+					System.out.println("impossibile convertire il valore inserito in un numero di porta");
+					System.out.println("l'applicazione verra' chiusa");
+					System.exit(0);
+				}
+
+				System.out.println("porta di ascolto impostata a:"+Constants.PortOfServer);
+			}
+			else
+			{
+				System.out.println("il valore inserito non e' corretto");
+				System.out.println("l'applicazione verra' chiusa");
+				System.exit(0);
+			}
 		}
 		catch(IOException e)
 		{}

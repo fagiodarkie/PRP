@@ -4,15 +4,11 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.Savepoint;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 import javax.jws.soap.SOAPBinding.Use;
 
 import com.sun.org.apache.xalan.internal.lib.NodeInfo;
-
 import it.unipr.informatica.reti.PRP.implementation.NetworkConnectionsManager;
 import it.unipr.informatica.reti.PRP.implementation.ParentClientManager;
 import it.unipr.informatica.reti.PRP.implementation.ParentsManager;
@@ -30,8 +26,11 @@ public class PRPClient {
 
 	static TableManager tableManager ;
 	static NetworkConnectionsManager connections ;
+	
 	public static void main(String args[]) throws UnknownHostException {
 	
+		
+		
 		
 		
 
@@ -59,7 +58,7 @@ public class PRPClient {
 			
 			@Override
 			public void ManageInput(String Message) {
-				if(Message.toUpperCase() == "EXIT")
+				if(Message.toUpperCase().equals("EXIT"))
 				{
 					//prima di uscire salvo i dati dei nodi che conosco
 					SaveTable();
