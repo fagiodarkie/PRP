@@ -3,6 +3,7 @@ package it.unipr.informatica.reti.PRP.implementation;
 import java.io.*;
 import java.net.*;
 import java.text.MessageFormat;
+import java.util.LinkedList;
 import java.util.List;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
@@ -118,12 +119,61 @@ public class ServerComponent implements ServerInterface {
 		commandClientCommunicationManagerInterface.SendMessage(Message + " - " + MyNick);
 		//END TEST
 		
-		if(Message.contains("@"))
+
+		if(Message.contains("@") && Message.trim().startsWith("@"))
 		{
+			System.out.println("CONTIENE UN COMANDO");	
 			
+			String partsOfMessage[]= Message.trim().split(" ");
+			LinkedList<String> Commands = new LinkedList<String>();
+			LinkedList<String> Messages = new LinkedList<String>();
+			boolean endCommand = false;
+			for(String part : partsOfMessage)
+				{
+					String temp = part.trim();
+					if(temp.startsWith("@") && !temp.equals("@") && !endCommand)
+					{	//è un comando e quindi lo inserisco nella lista dei comandi
+						Commands.add(part.replace("@", ""));
+					}
+					else
+					{
+						Messages.add(part);
+						endCommand = true;
+					}
+				}
+		
+			//ricreo il messaggio da inviare
+			String Messaggio = "";
+			for(String m : Messages)
+			{
+				Messaggio += m + " ";
+			}
+			
+			boolean broadcast = false;
+			for(String c : Commands)
+			{
+				if( c.toUpperCase().equals("BROADCAST"))
+				{
+					broadcast = true;
+					break;
+				}
+			}
+			
+			if(broadcast)
+			{
+				//TODO completare invio parte broadcast
+			}
+			else
+			{
+				//TODO completare invio multicast
+				
+			}
+				
 		}
 		else
-			this.commandClientCommunicationManagerInterface.SendMessage("comando non valido");
+		{
+			commandClientCommunicationManagerInterface.SendMessage("il comando non e' valido");
+		}
 	}
 
 	

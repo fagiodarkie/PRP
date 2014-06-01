@@ -9,6 +9,7 @@ import java.util.*;
 import javax.jws.soap.SOAPBinding.Use;
 
 import com.sun.org.apache.xalan.internal.lib.NodeInfo;
+
 import it.unipr.informatica.reti.PRP.implementation.NetworkConnectionsManager;
 import it.unipr.informatica.reti.PRP.implementation.ParentClientManager;
 import it.unipr.informatica.reti.PRP.implementation.ParentsManager;
@@ -58,16 +59,41 @@ public class PRPClient {
 			
 			@Override
 			public void ManageInput(String Message) {
-				if(Message.toUpperCase().equals("EXIT"))
-				{
-					//prima di uscire salvo i dati dei nodi che conosco
-					SaveTable();
+					switch (Message.toUpperCase())
+					{
+					case "EXIT":
+						//prima di uscire salvo i dati dei nodi che conosco
+						SaveTable();
+						
+						//successivamente termino il programma
+						System.exit(0);
+						break;
 					
-					//successivamente termino il programma
-					System.exit(0);
-				}
-				else
-				serverComponent.ManageMessageFromUserInterface(Message, Nick);
+					case "HELP":
+						userInterface.PrintMessage("PRPClient coded by Alessio Bortolotti and Jacopo Freddi");
+						userInterface.PrintMessage("@nick message --> send message to user with the nickname equals to nick");
+						userInterface.PrintMessage("@broadcast message --> send message to all user");
+						userInterface.PrintMessage("nicks list --> get the list of user");
+						userInterface.PrintMessage("exit --> exit from the chat network");
+						userInterface.PrintMessage("!!!WARNING: nick are case sensitive!!!");
+						break;
+					
+					case "NICKS LIST":
+						String MessageToUserInterface = "";
+						//per ogni nodo a me conosciuto inserisco il nickname nem messaggio
+						for(String nick : tableManager.getConnectedNodes())
+							MessageToUserInterface.concat(nick + "\n");
+						//mando il messaggio all'interfaccia grafica
+						userInterface.PrintMessage(MessageToUserInterface);
+						break;
+						
+					default:
+						serverComponent.ManageMessageFromUserInterface(Message, Nick);
+						
+					
+					}
+					
+				
 			}
 		});
 		
