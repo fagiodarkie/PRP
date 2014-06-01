@@ -217,7 +217,33 @@ public class ServerComponent implements ServerInterface {
 				break;
 			/*messaggio TABLE   */      
 				case Constants.MessageTableCode:
-					//TODO manage backuptable
+					
+					//estraggo la tabella dal messaggio
+					String table = messageManagement.getData();
+					
+					//divido le varie informazioni
+					String Rows[] = table.split(":");
+					
+					//le informazioni devono essere per forza un multiplo di 3
+					if(Rows.length % 3 != 0)
+						throw new Exception("errore messaggio tabella ( i dati riguardanti la tabella non sono in numero pari)");
+					
+					//per ogni terna d'informazioni aggiorno la tabella
+					for(int i = 0 ; i < Rows.length ; i += 3 )
+					{
+						/*if(!tableManager.isItConnected(Rows[i]))
+							tableManager.notifyIsReachedBy(tableManager.getInfoByNick(Client),
+														new UserInformations(Rows[i], Integer.parseInt(Rows[i + 1]), InetAddress.getByName(Rows[i + 2])));
+						else
+							{
+							tableManager.notifyIsReachedBy(tableManager.getInfoByNick(Client),
+									new UserInformations(Rows[i], Integer.parseInt(Rows[i + 1]), InetAddress.getByName(Rows[i + 2])));
+
+							}*/
+						tableManager.notifyIsReachedBy(tableManager.getInfoByNick(Client),
+								new UserInformations(Rows[i], Integer.parseInt(Rows[i + 1]), InetAddress.getByName(Rows[i + 2])));
+					}
+					
 				break;
 
 		}
