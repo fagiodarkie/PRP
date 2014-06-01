@@ -31,14 +31,91 @@ public class POJOMessage implements MessageInterface {
 		data = "";
 		
 	}
-	public POJOMessage(String Message){
+	public POJOMessage(String Message) throws Exception{
 		
 		this();
 		String partsOfMessaggio[] = Message.split(Constants.MessagePartsDivisor);
-		
-		switch ( partsOfMessaggio.length )
+
+		code = partsOfMessaggio[0];
+		switch ( partsOfMessaggio[0] )
 		{
-		
+			case Constants.MessageHelloCode:
+				if(partsOfMessaggio.length < 3)
+					throw new Exception("messaggio non valido");
+				else{
+					sender = partsOfMessaggio[1];
+					data = partsOfMessaggio[2];
+					receiver = "";
+					
+				}
+				break;
+			case Constants.MessagePointToPointCode:
+				if(partsOfMessaggio.length < 4)
+					throw new Exception("messaggio non valido");
+				else{
+					sender = partsOfMessaggio[1];
+					data = partsOfMessaggio[3];
+					receiver = partsOfMessaggio[2];
+					
+				}
+				break;
+			
+			case Constants.MessageBroadcastCode:
+				if(partsOfMessaggio.length < 3)
+					throw new Exception("messaggio non valido");
+				else{
+					sender = partsOfMessaggio[1];
+					data = partsOfMessaggio[2];
+					receiver = "";
+					
+				}
+				break;
+			
+			case Constants.MessageBackupNickCode:
+				if(partsOfMessaggio.length < 2)
+					throw new Exception("messaggio non valido");
+				else{
+					data = data;
+					sender = "";
+					receiver = "";
+					
+				}
+				break;
+				
+			case Constants.MessageReachableCode:
+				if(partsOfMessaggio.length < 3)
+					throw new Exception("messaggio non valido");
+				else{
+					sender = partsOfMessaggio[1];
+					data = partsOfMessaggio[2];
+					receiver = "";
+					
+				}
+				break;
+			
+			case Constants.MessageNotReachableCode:
+				if(partsOfMessaggio.length < 2)
+					throw new Exception("messaggio non valido");
+				else{
+					data = partsOfMessaggio[2];
+					sender = "";
+					receiver = "";
+					
+				}
+				break;
+			
+
+			case Constants.MessageTableCode:
+				if(partsOfMessaggio.length < 2)
+					throw new Exception("messaggio non valido");
+				else{
+					data = partsOfMessaggio[2];
+					sender = "";
+					receiver = "";
+					
+				}
+				break;
+			/*
 			case 4:
 					code = partsOfMessaggio[0];
 					sender = partsOfMessaggio[1];
@@ -54,6 +131,7 @@ public class POJOMessage implements MessageInterface {
 				code = partsOfMessaggio[0];
 				data = partsOfMessaggio[1];
 				break;
+			*/
 		}
 	}
 	

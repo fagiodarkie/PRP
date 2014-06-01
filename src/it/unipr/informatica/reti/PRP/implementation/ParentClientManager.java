@@ -97,7 +97,10 @@ public class ParentClientManager implements ClientInterface {
 			@Override
 			public void manageMessage(String Message, String Client) {
 
-				POJOMessage pojoMessage = new POJOMessage(Message);
+				POJOMessage pojoMessage;
+				try {
+					pojoMessage = new POJOMessage(Message);
+				
 				
 				if( pojoMessage.getCode().equals(Constants.MessageBackupNickCode))
 				{
@@ -105,6 +108,10 @@ public class ParentClientManager implements ClientInterface {
 				}
 				else
 					command.manageMessage(Message, Client);
+				} catch (Exception e) {
+					// TODO gestire errore messaggio non valido
+					e.printStackTrace();
+				}
 				
 			}
 			

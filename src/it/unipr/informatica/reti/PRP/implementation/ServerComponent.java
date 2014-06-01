@@ -129,7 +129,11 @@ public class ServerComponent implements ServerInterface {
 	 */
 	public void ManageMessage(String Message,String Client)
 	{
-		POJOMessage messageManagement = new POJOMessage(Message);
+		
+		POJOMessage messageManagement;
+		try {
+			messageManagement = new POJOMessage(Message);
+		
 
 
 
@@ -172,7 +176,7 @@ public class ServerComponent implements ServerInterface {
 			break;
 			/*messaggio REACHABLE     */
 			case Constants.MessageReachableCode :
-				//TODO controllare get data di POJOMessage
+				
 
 				if(!tableManager.isItConnected(messageManagement.getData()))
 				{
@@ -216,6 +220,10 @@ public class ServerComponent implements ServerInterface {
 					//TODO manage backuptable
 				break;
 
+		}
+		} catch (Exception e) {
+			// TODO gestire errore messaggio non valido
+			e.printStackTrace();
 		}
 
 	}

@@ -120,6 +120,7 @@ public class PRPClient {
 			for(String nick : listaNick)
 			{
 				UserInformationsInterface nodeInfo = tableManager.getInfoByNick(nick);
+				
 				out.println(nodeInfo.getNick() + Constants.FileBackupInformationDivisor + 
 							nodeInfo.getPort()+ Constants.FileBackupInformationDivisor + 
 							nodeInfo.getAddress().toString() );
