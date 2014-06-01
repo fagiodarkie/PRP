@@ -140,10 +140,15 @@ public class ServerComponent implements ServerInterface {
 		//STEP 2 controllo che genere di messaggio e' e lo gestisco
 		switch(messageManagement.getCode())
 		{
+		
+		
 		/*messaggio HELLO       */	
 			case Constants.MessageHelloCode :
 				//DO NOTHING
 			break;
+			
+			
+			
 		/*messaggio POINT TO POINT*/
 			case Constants.MessagePointToPointCode:
 				if(!tableManager.isItConnected(messageManagement.getReceiver()))
@@ -158,6 +163,8 @@ public class ServerComponent implements ServerInterface {
 				}
 			break;
 
+			
+			
 		/*messaggio BROADCAST     */
 			case Constants.MessageBroadcastCode :
 
@@ -170,10 +177,16 @@ public class ServerComponent implements ServerInterface {
 				}
 
 			break;
+			
+			
+			
 			/*messaggio BACKUP NICK   */
 			case Constants.MessageBackupNickCode:
 				//DO NOTHING ONLY PARENT CAN SEND BACKUP NICK
 			break;
+			
+			
+			
 			/*messaggio REACHABLE     */
 			case Constants.MessageReachableCode :
 				
@@ -242,6 +255,21 @@ public class ServerComponent implements ServerInterface {
 							}*/
 						tableManager.notifyIsReachedBy(tableManager.getInfoByNick(Client),
 								new UserInformations(Rows[i], Integer.parseInt(Rows[i + 1]), InetAddress.getByName(Rows[i + 2])));
+					}
+					
+					//genero il messaggio riguardante la mia tabella
+					String MyTable = MessageFormatter.GenerateTableMessage(this.tableManager);
+					
+					//ottengo tutti i nodi a me vicini
+					List<String> myNeighbors = tableManager.allMyNeighbors();
+					
+					//estraggo dalla lista il nodo che mi ha inviato la sua tabella
+					myNeighbors.remove(Client);
+					
+					for(String nick : myNeighbors)
+					{
+						//invio la tabella agli altri nodi vicini
+						connections.sendMesage(nick, MyTable);
 					}
 					
 				break;
