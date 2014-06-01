@@ -153,8 +153,7 @@ public class ServerComponent implements ServerInterface {
 			case Constants.MessagePointToPointCode:
 				if(!tableManager.isItConnected(messageManagement.getReceiver()))
 				{
-					//allora sono io
-					//TODO aggiornare l'interfaccia grafica con il nuovo messaggio ricevuto
+					this.commandClientCommunicationManagerInterface.SendMessage(Client + ":" + messageManagement.getData());
 				}
 				else
 				{
