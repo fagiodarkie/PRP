@@ -36,7 +36,8 @@ public class MessageFormatter {
 	public static String GenerateReachableMessage(String Nick)
 	{
 		return Constants.MessageReachableCode + Constants.MessagePartsDivisor + Nick;
-	}	
+	}
+	
 	public static String GenerateNotReachableMessage(String Nick)
 	{
 		return Constants.MessageNotReachableCode + Constants.MessagePartsDivisor + Nick;

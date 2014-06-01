@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -146,124 +147,8 @@ public class ParentsManager {
 	 */
 	static private List<String> readTable()
 	{
-		List<String> informations = new List<String>() {
-			
-			@Override
-			public <T> T[] toArray(T[] a) {
-				return null;
-			}
-			
-			@Override
-			public Object[] toArray() {
-				return null;
-			}
-			
-			@Override
-			public List<String> subList(int fromIndex, int toIndex) {
-				return null;
-			}
-			
-			@Override
-			public int size() {
-				return 0;
-			}
-			
-			@Override
-			public String set(int index, String element) {
-				return null;
-			}
-			
-			@Override
-			public boolean retainAll(Collection<?> c) {
-				return false;
-			}
-			
-			@Override
-			public boolean removeAll(Collection<?> c) {
-				return false;
-			}
-			
-			@Override
-			public String remove(int index) {
-				return null;
-			}
-			
-			@Override
-			public boolean remove(Object o) {
-				return false;
-			}
-			
-			@Override
-			public ListIterator<String> listIterator(int index) {
-				return null;
-			}
-			
-			@Override
-			public ListIterator<String> listIterator() {
-				return null;
-			}
-			
-			@Override
-			public int lastIndexOf(Object o) {
-				return 0;
-			}
-			
-			@Override
-			public Iterator<String> iterator() {
-				return null;
-			}
-			
-			@Override
-			public boolean isEmpty() {
-				return false;
-			}
-			
-			@Override
-			public int indexOf(Object o) {
-				return 0;
-			}
-			
-			@Override
-			public String get(int index) {
-				return null;
-			}
-			
-			@Override
-			public boolean containsAll(Collection<?> c) {
-				return false;
-			}
-			
-			@Override
-			public boolean contains(Object o) {
-				return false;
-			}
-			
-			@Override
-			public void clear() {
-				
-			}
-			
-			@Override
-			public boolean addAll(int index, Collection<? extends String> c) {
-				return false;
-			}
-			
-			@Override
-			public boolean addAll(Collection<? extends String> c) {
-				return false;
-			}
-			
-			@Override
-			public void add(int index, String element) {
-				
-			}
-			
-			@Override
-			public boolean add(String e) {
-				return false;
-			}
-		};
-			
+		
+		LinkedList<String> informations = new LinkedList<String>();
 		
 		BufferedReader br;
 		try {

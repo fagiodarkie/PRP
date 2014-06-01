@@ -117,8 +117,13 @@ public class ServerComponent implements ServerInterface {
 		System.out.println("messaggio ricevuto dall'interfaccia grafica --> messaggio='"+ Message +"'; nick='"+ MyNick +"'");
 		commandClientCommunicationManagerInterface.SendMessage(Message + " - " + MyNick);
 		//END TEST
-
-
+		
+		if(Message.contains("@"))
+		{
+			
+		}
+		else
+			this.commandClientCommunicationManagerInterface.SendMessage("comando non valido");
 	}
 
 	
@@ -153,6 +158,7 @@ public class ServerComponent implements ServerInterface {
 			case Constants.MessagePointToPointCode:
 				if(!tableManager.isItConnected(messageManagement.getReceiver()))
 				{
+					//il messaggio è rivolto a me e quindi lo invio all'interfaccia grafica
 					this.commandClientCommunicationManagerInterface.SendMessage(Client + ":" + messageManagement.getData());
 				}
 				else
