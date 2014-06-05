@@ -7,19 +7,28 @@ import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
 public class UserInformations implements UserInformationsInterface {
 
 	/**
-	 * 
+	 * The implementation of UserInformations used in this project.
+	 * Other, more or less performant versions could be developed.
 	 */
 	
 	/**
-	 * 
+	 * the nickname of the User described by this object.
+	 * The network works assuming that no nickname is duplicated, therefore
+	 * anyone who (willingly or not) chooses a nickname already connected to
+	 * the network will destabilize it.
 	 */
 	private String nick;
+	
 	/**
-	 * 
+	 * Every nicnkame is assumed to have a fixed port. Its listen socket
+	 * should bind to this port and never to other ones.
 	 */
 	private int port;
+	
 	/**
-	 * 
+	 * The IP address of the listening socket. This too should not change. 
+	 * Moreover, it should be the actual IP address, and not 'localhost'.
+	 * Unless one wants to create a local network, in which case it is fine.
 	 */
 	private InetAddress address;
 	
@@ -49,6 +58,7 @@ public class UserInformations implements UserInformationsInterface {
 
 	/**
 	 * Constructor from a marshalled UserInformation.
+	 * 
 	 * @param newInterface the marshalled informations.
 	 */
 	public UserInformations(String newInterface) {

@@ -1,5 +1,10 @@
-1) Add a caching mechanism that buffers the message which should be sent to disconnected nicks and tries to send them as soon as they are reachable.
-2) Implement a nicer "connect to this node" selection.
-3) Implement the network as a balanced tree rather than a graph and provide methods to reliably connect and balance the network tree.
-4) Implement user groups to exploit Multicast.
-5) Implement friendship mechanism for connection and message sending. 
+1)	Add a caching mechanism that buffers the message which should be sent to disconnected nicks and tries to send them as soon as they are reachable.
+2)	Implement a nicer "connect to this node" selection.
+3)	Implement the network as a balanced tree rather than a graph and provide methods to reliably connect and balance the network tree.
+4)	Implement user-defined groups to exploit Multicast.
+5)	Implement friendship mechanism for connection and message sending. 
+6)	Port this project on Android Platform.
+7)	Implement nickname control: on connection, the nickname existence is checked through the network and, if absent, is reserved and acquired by the new node.
+8)	Alternatively, provide an ID to every user created, possibly as a hash of the chosen nickname and the creation timestamp. Notice that this leads to the need for error management in case the user asks to send a message to a nickname owned by more than one user.
+9)	Make it possible to "split" the program into 2 distinct sections: "server" is launched first, providing connectivity towards the network and printing the incoming messages, while "client" is launched after "server" (passing server's private listening socket port as a parameter?) and provides user interface.
+10)	Add timestamp information to the message and write them in order in the gui, maybe divided by sender. 

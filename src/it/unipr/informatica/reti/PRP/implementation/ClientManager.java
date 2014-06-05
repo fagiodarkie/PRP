@@ -15,6 +15,13 @@ public class ClientManager implements ClientInterface{
 	int clientPort;
 	InetAddress clientIP;
 	
+	/**
+	 * Client communication manager. This object is used to communicate with users who connects to us.
+	 * 
+	 * @param socket the socket returned by the listen() method of the listen socket.
+	 * @param comandoGestioneMessaggi the event controller
+	 * @throws Exception
+	 */
 	public ClientManager(Socket socket,final Command comandoGestioneMessaggi) throws Exception
 	{
 		clientCommunicationManager = new ClientCommunicationManager(socket,new Command() {
@@ -52,21 +59,36 @@ public class ClientManager implements ClientInterface{
 		
 	}
 	
+	/**
+	 * @return the nickname of the user to which we are connected through this client.
+	 */
 	@Override
 	public String getNick()
 	{
 		return this.clientNick;
 	}
+
+	/**
+	 * @return the listen port of the user to which we are connected through this client.
+	 */
 	@Override
 	public int getPort()
 	{
 		return this.clientPort;
 	}
+
+	/**
+	 * @return the listen address of the user to which we are connected through this client.
+	 */
 	@Override
 	public InetAddress getIP()
 	{
 		return this.clientIP;
 	}
+	
+	/**
+	 * @return true if the message is successfully sent.
+	 */
 	@Override
 	public Boolean sendMessage(String message)
 	{

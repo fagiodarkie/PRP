@@ -32,7 +32,12 @@ public class ParentClientManager implements ClientInterface {
 	
 	ClientCommunicationManager serverCommunicationManager ;
 	
-	private void UpdateBAckupInformation(POJOMessage pojoMessage)
+	/**
+	 * Extracts the backup informations from a message and updates relevant informations.
+	 * 
+	 * @param pojoMessage
+	 */
+	private void UpdateBackupInformation(POJOMessage pojoMessage)
 	{
 		//se è un messaggio di backup allora lo gestisco e mi salvo le informazioni
 		backupNick = pojoMessage.getSender();
@@ -48,6 +53,18 @@ public class ParentClientManager implements ClientInterface {
 	
 	}
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param Nick the nickname of the user from which we accept connection request.
+	 * @param Port the listen port of the user from which we accept connection request.
+	 * @param IP the listen address of the user from which we accept connection request.
+	 * @param MyNick our nickname.
+	 * @param MyPort our listen port.
+	 * @param MyIP our listen address.
+	 * @param command (?)
+	 * @param parentsManager the manager of our first connection.
+	 */
 	public ParentClientManager(String Nick,int Port,InetAddress IP,String MyNick,String MyPort,InetAddress MyIP,Command command,ParentsManager parentsManager)
 	{
 		this.serverIP = IP;
@@ -60,6 +77,13 @@ public class ParentClientManager implements ClientInterface {
 		this.MyPort = MyPort;
 	}
 	
+	/**
+	 * connects to the user whose nickname is specified.
+	 * 
+	 * @param Nick the nickname of the user to which we want to connect.
+	 * @return true if all went well. False otherwise
+	 * @throws Exception if the message does not contain the backup nickname.
+	 */
 	public boolean connect(String Nick) throws Exception
 	{
 		try{
@@ -78,14 +102,11 @@ public class ParentClientManager implements ClientInterface {
 		
 		if(pojoMessage.getCode().equals(Constants.MessageBackupNickCode))
 		{
-			UpdateBAckupInformation(pojoMessage);
+			UpdateBackupInformation(pojoMessage);
 		}
 		else
 			throw new Exception("ERRORE");
 		
-		
-		
-
 		serverCommunicationManager = new ClientCommunicationManager(serverSocket,new Command() {
 			
 			@Override
@@ -104,7 +125,7 @@ public class ParentClientManager implements ClientInterface {
 				
 				if( pojoMessage.getCode().equals(Constants.MessageBackupNickCode))
 				{
-					UpdateBAckupInformation(pojoMessage);
+					UpdateBackupInformation(pojoMessage);
 				}
 				else
 					command.manageMessage(Message, Client);

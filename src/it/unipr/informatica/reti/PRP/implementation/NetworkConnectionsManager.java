@@ -4,6 +4,8 @@ import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
 
 import java.util.*;
 public class NetworkConnectionsManager {
+	
+	// FIXME is this still used? Table manager assolves all the features here proposed, better.
 
 	//stato interno
 	Hashtable<String, ClientInterface> hashtableNickClient;
@@ -17,8 +19,9 @@ public class NetworkConnectionsManager {
 	
 	/**
 	 * Insert new client to the list
-	 * @param 
-	 * @param 
+	 * 
+	 * @param nick
+	 * @param newClient
 	 * @return return false if the nickname is already used
 	 */
 	public boolean addClient(String nick, ClientInterface newClient)

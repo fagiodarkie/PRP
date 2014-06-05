@@ -15,6 +15,13 @@ public class ClientCommunicationManager implements ClientCommunicationManagerInt
 	ClientWorker clientWorker;
 	Thread t ;
 	
+	/**
+	 * create a socket wrapping which extends the socket functionalities for client communications
+	 * 
+	 * @param socket the socket to be wrapped
+	 * @param comandoGestioneMessaggi the controller
+	 * @throws Exception
+	 */
 	public ClientCommunicationManager(Socket socket,Command comandoGestioneMessaggi) throws Exception
 	{
 		//creo il worker da passare al thread per la gestione della ocmunicazione
@@ -30,11 +37,22 @@ public class ClientCommunicationManager implements ClientCommunicationManagerInt
 		
 	}
 
+	/**
+	 * send a message to this user.
+	 * Notice: this is not limited to user-defined messages. Topology change messages also,
+	 * when correctly spelled, must pass through this method. 
+	 * 
+	 * @return true if the message is correctly sent.
+	 */
 	@Override
 	public Boolean SendMessage(String Message) {
 		return clientWorker.sendMessage(Message);
 	}
 
+	/**
+	 * Orders this socket wrapping to stop listening for user messages.
+	 * This is necessary when disconnecting from the network.
+	 */
 	public void stopListening()
 	{
 		
@@ -48,6 +66,11 @@ public class ClientCommunicationManager implements ClientCommunicationManagerInt
 
 //START CLIENT WORKER CLASS
 class ClientWorker implements Runnable {
+	
+	/**
+	 * Thread implementing connectivity between our client and another user's. 
+	 */
+	
 	private Socket client;
 	BufferedReader in = null;
 	PrintWriter out = null;
