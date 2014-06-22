@@ -113,16 +113,10 @@ public class ServerComponent implements ServerInterface {
 	 */
 	public void ManageMessageFromUserInterface(String Message,String MyNick)
 	{
-		//TODO remove test
-		//TEST
-		System.out.println("messaggio ricevuto dall'interfaccia grafica --> messaggio='"+ Message +"'; nick='"+ MyNick +"'");
-		commandClientCommunicationManagerInterface.SendMessage(Message + " - " + MyNick);
-		//END TEST
 		
 
 		if(Message.contains("@") && Message.trim().startsWith("@"))
 		{
-			System.out.println("CONTIENE UN COMANDO");	
 			
 			String partsOfMessage[]= Message.trim().split(" ");
 			LinkedList<String> Commands = new LinkedList<String>();
@@ -149,6 +143,9 @@ public class ServerComponent implements ServerInterface {
 				Messaggio += m + " ";
 			}
 			
+			//TODO remove test code
+			commandClientCommunicationManagerInterface.SendMessage("il messaggio e': "+Messaggio);
+			
 			boolean broadcast = false;
 			for(String c : Commands)
 			{
@@ -161,12 +158,18 @@ public class ServerComponent implements ServerInterface {
 			
 			if(broadcast)
 			{
-				//TODO completare invio parte broadcast
+				//sendBroadcast(Messaggio);
+				//TODO remove test code.
+				commandClientCommunicationManagerInterface.SendMessage("messaggio broadcast");
 			}
 			else
 			{
-				//TODO completare invio multicast
-				
+				for(String nick : Commands)
+				{
+					//sendPointToPoint(Messaggio, nick);
+					//TODO remove test code
+					commandClientCommunicationManagerInterface.SendMessage("messaggio diretto a:" + nick);
+				}
 			}
 				
 		}
@@ -177,6 +180,50 @@ public class ServerComponent implements ServerInterface {
 	}
 
 	
+	
+	
+	//INIZIO SEZIONE INVIO MESSAGGI
+	/**
+	 * permette di inviare un messaggio a tutti i nodi vicini
+	 * @param Message messaggio da inviare
+	 */
+	private void sendBroadcast(String Message)
+	{
+		for(String nick : tableManager.allMyNeighbors())
+		{
+				connections.getClient(nick).sendMessage(Message);
+		}
+	}
+
+	/**
+	 * permette d'inviare un messaggio a tutti  i nodi vicini tranne a nickNoNA
+	 * @param Message messagio da inviare
+	 * @param nickNoNA nick a cui non inviarlo
+	 */
+	private void sendBroadcast(String Message, String nickNoNA)
+	{
+
+		for(String nick : tableManager.allMyNeighbors())
+		{
+			if(nick != nickNoNA)
+			{
+				connections.getClient(nick).sendMessage(Message);
+			}
+		}
+	}
+	
+	/**
+	 * invia un messaggio ad un utente
+	 * @param Message messaggio da inviare
+	 * @param Nick nickname dell'utente a cui inviarlo
+	 */
+	private void sendPointToPoint(String Message, String Nick)
+	{
+		//lo devo mandare sulla linea corretta
+		connections.sendMesage(Nick, Message);
+	}
+	
+	//FINE SEZIONE INVIO MESSAGGI
 	/**
 	 * Gestisce l'arrivo dei messaggi passati dai vari client (compreso il genitore)
 	 * @param Message messaggio ricevuto
@@ -213,8 +260,8 @@ public class ServerComponent implements ServerInterface {
 				}
 				else
 				{
-					//lo devo mandare sulla linea corretta
-					connections.sendMesage(tableManager.howToReach(messageManagement.getReceiver()), Message);
+					//inoltro il messaggio
+					sendPointToPoint(Message, tableManager.howToReach(messageManagement.getReceiver()));
 				}
 			break;
 
@@ -222,14 +269,7 @@ public class ServerComponent implements ServerInterface {
 			
 		/*messaggio BROADCAST     */
 			case Constants.MessageBroadcastCode :
-
-				for(String nick : tableManager.allMyNeighbors())
-				{
-					if(nick != Client)
-					{
-						connections.getClient(nick).sendMessage(Message);
-					}
-				}
+				sendBroadcast(Message, Client);
 
 			break;
 			

@@ -30,7 +30,7 @@ public class PRPClient {
 	
 	public static void main(String args[]) throws UnknownHostException {
 	
-		
+		//TODO inserire connessione manuale a padre
 		
 		
 		

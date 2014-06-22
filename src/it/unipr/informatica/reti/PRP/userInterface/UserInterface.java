@@ -80,11 +80,7 @@ public class UserInterface {
 	 * @param Message
 	 */
 	public void PrintMessage(String Message)
-	{	//TODO remove test
-		//TEST
-		System.out.println("Messaggio ricevuto dal server:'" + Message + "'");
-		//END TEST
-		System.out.println(Message);
+	{	System.out.println(Message);
 	}
 	
 	public String getNick () 
