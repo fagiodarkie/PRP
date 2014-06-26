@@ -23,12 +23,34 @@ public class ParentsManager {
 	NetworkConnectionsManager connectionsManager;
 	TableManager tableManager;
 	Command command;
+	
+	/**
+	 * Constructor. This manager is different from the ClientManager as the socket used differ a little.
+	 * This object manages the communication with the node to which the client first connected (from
+	 * now on called "parent" node).
+	 * 
+	 * @param connectionsManager the connections manager to which it should communicate topology changes and messages
+	 * @param tableManager the table manager to which notifications should be given.
+	 * @param command (?)
+	 */
 	public ParentsManager(NetworkConnectionsManager connectionsManager,TableManager tableManager, Command command)
 	{
 		this.connectionsManager = connectionsManager;
 		this.command= command;
 		this.tableManager = tableManager;
 	}
+	
+	/**
+	 * Connect to the specified client. It will serve as a gate for the network.
+	 * 
+	 * @param Nick nickname of the client to which we want to connect.
+	 * @param Port listen port of the client to which we want to connect. 
+	 * @param IP listen address of the client to which we want to connect.
+	 * @param MyNick our nickname.
+	 * @param MyPort our listen port.
+	 * @param MyIp our listen address.
+	 * @return true if the connection went well, false otherwise.
+	 */
 	public Boolean connect(String Nick, int Port, InetAddress IP, String MyNick, int MyPort, InetAddress MyIp)
 	{
 		try
@@ -127,7 +149,9 @@ public class ParentsManager {
 		
 	}
 	
-	
+	/**
+	 * If something goes wrong, we try to connect again, using the same informations.
+	 */
 	public void riconnetti()
 	{
 		//mi salvo le informazioni riguardanti il nodo di backup
@@ -142,8 +166,9 @@ public class ParentsManager {
 	}
 	
 	/**
-	 * legge da file le informazioni riguardanti i client noti salvate nella sessione precedente
-	 * @return restituisce una lista di stringhe contenenti le informazioni dei client
+	 * Read from file the informations about known clients, which may have been saved in the previous session (if any).
+	 * 
+	 * @return a list of strings containing the existing clients' informations.
 	 */
 	static private List<String> readTable()
 	{

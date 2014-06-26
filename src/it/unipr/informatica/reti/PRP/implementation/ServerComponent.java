@@ -24,6 +24,14 @@ public class ServerComponent implements ServerInterface {
 	//END STATO INTERNO
 
 	//START CONSTRUCTOR
+	/**
+	 * Network component acting as a "server", taking care of message sending and receiving.
+	 * Separated from the user interface component, as these parts could also be split.
+	 * 
+	 * @param manager the table manager which should be used by the server component
+	 * @param connessioni the connection manager through which the server component should communicate
+	 * @param command the component from which the server component is taking orders (?).
+	 */
 	public ServerComponent(TableManager manager,NetworkConnectionsManager connessioni, ClientCommunicationManagerInterface command)
 	{
 		this.tableManager = manager;
@@ -33,6 +41,12 @@ public class ServerComponent implements ServerInterface {
 	//END CONSTRUCTOR
 
 	//START CONNECTION MANAGEMENT METHOD
+	/**
+	 * Starts listening to the server listen port. The client can link to this port and see the
+	 * network as a simple socket in which he can send the messages he wants to send.
+	 * After that, it starts accepting connections from the nodes. Beware, the ServerComponent
+	 * is the actual node of the network, the user is like a periferal leecher.
+	 */
 	@Override
 	public void start()  {
 		
@@ -44,6 +58,13 @@ public class ServerComponent implements ServerInterface {
 		}
 		System.out.println("connessione alla porta avvenuta con successo");
 
+		/* FIXME maybe like this?
+		 * 
+		 * declare accept as private boolean in the class members;
+		 * 
+		 * accept = true;
+		 * while (accept) {
+		 */
 		while(true){
 			try {
 				ClientManager c = new ClientManager(serverSocket.accept(), new Command() {
@@ -98,18 +119,30 @@ public class ServerComponent implements ServerInterface {
 
 
 	}
+	
+	/**
+	 * Commands the server to stop listening to the outside.
+	 */
 	@Override
 	public Boolean stop() {
-		// TODO FINE ASCOLTO
+		/* FIXME perché Boolean? volevi dire boolean? è necessario un tipo di ritorno?
+		 * 
+		 * TODO FINE ASCOLTO
+		 * FIXME maybe like this?
+		 * 
+		 * accept = false;
+		 * connections.stopListening(); // this must be implemented
+		 */
 		return null;
 	}
 	//END CONNECTION MANAGEMENT METHOD
 
 
 	/**
-	 * Gestisce i messassi ricevuti dall'interfaccia grafica
-	 * @param Message
-	 * @param MyNick
+	 * Manages the messages coming from the interface, redirecting or processing them.
+	 * 
+	 * @param Message the message to be processed.
+	 * @param MyNick nickname to which the message should be sent, if any (?)
 	 */
 	public void ManageMessageFromUserInterface(String Message,String MyNick)
 	{
@@ -225,9 +258,10 @@ public class ServerComponent implements ServerInterface {
 	
 	//FINE SEZIONE INVIO MESSAGGI
 	/**
-	 * Gestisce l'arrivo dei messaggi passati dai vari client (compreso il genitore)
-	 * @param Message messaggio ricevuto
-	 * @param Client nick del client che ha mandato il messaggio
+	 * Manages the receiving of messages sent from the other client, parent included.
+	 *
+	 * @param Message received message
+	 * @param Client nickname of the client who sent the message.
 	 */
 	public void ManageMessage(String Message,String Client)
 	{
@@ -378,8 +412,9 @@ public class ServerComponent implements ServerInterface {
 	}
 
 	/**
-	 * Gestisce la disconnessione di un client
-	 * @param nick
+	 * Manages the disconnection of a client.
+	 * 
+	 * @param nick the client who is about to be disconnected.
 	 */
 	 public void ManageDisconnection(String nick)
 	{

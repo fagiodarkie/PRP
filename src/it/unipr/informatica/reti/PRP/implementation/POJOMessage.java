@@ -18,7 +18,6 @@ public class POJOMessage implements MessageInterface {
 	 * - sender
 	 * - destination
 	 * - message type
-	 * - actual data
 	 * 
 	 * are provided.
 	 */
@@ -152,6 +151,8 @@ public class POJOMessage implements MessageInterface {
 	}
 
 	/**
+	 * This feature is left to do to the ones who'll come after us.
+	 * 
 	 * @return the time in which this message was generated
 	 */
 	@Override
