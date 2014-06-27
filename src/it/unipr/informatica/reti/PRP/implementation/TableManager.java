@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import it.unipr.informatica.reti.PRP.interfaces.NetworkTableInterface;
-import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
 
 public class TableManager implements NetworkTableInterface {
 
@@ -27,19 +26,19 @@ public class TableManager implements NetworkTableInterface {
 	 */
 	private class Couple {
 		
-		private UserInformationsInterface reachable;
-		private UserInformationsInterface exitInterface;
+		private String reachable;
+		private String exitInterface;
 		
-		public Couple(UserInformationsInterface first, UserInformationsInterface second) {
+		public Couple(String first, String second) {
 			reachable = first;
 			exitInterface = second;
 		}
 		
-		public UserInformationsInterface getReachable() {
+		public String getReachable() {
 			return reachable;
 		}
 		
-		public UserInformationsInterface getInterface() {
+		public String getInterface() {
 			return exitInterface;
 		}
 		
@@ -47,7 +46,7 @@ public class TableManager implements NetworkTableInterface {
 			return reachable.equals(exitInterface);
 		}
 		
-		public void resetInterface(UserInformationsInterface newInterface) {
+		public void resetInterface(String newInterface) {
 			exitInterface = newInterface;
 		}
 	}
@@ -74,7 +73,7 @@ public class TableManager implements NetworkTableInterface {
 	 */
 	public boolean isItConnected(String nick) {
 		for (int i = 0; i < howToReach.size(); ++i)
-			if (howToReach.get(i).getReachable().getNick().equals(nick))
+			if (howToReach.get(i).getReachable().equals(nick))
 				return true;
 		return false;
 	}
@@ -87,9 +86,9 @@ public class TableManager implements NetworkTableInterface {
 	 * @returns the UserInformationsInterface structure holding the informations
 	 * regarding the user. If the user is not connected, null is returned.
 	 */
-	public UserInformationsInterface getInfoByNick(String nick) {
+	public String getInfoByNick(String nick) {
 		for (int i = 0; i < howToReach.size(); ++i)
-			if (howToReach.get(i).getReachable().getNick().equals(nick))
+			if (howToReach.get(i).getReachable().equals(nick))
 				return howToReach.get(i).getReachable();
 		return null;
 	}
@@ -104,51 +103,23 @@ public class TableManager implements NetworkTableInterface {
 	 */
 	public String howToReach(String nick) {
 		for (int i = 0; i < howToReach.size(); ++i)
-			if (howToReach.get(i).getReachable().getNick().equals(nick)) {
-				return howToReach.get(i).getInterface().getNick();
+			if (howToReach.get(i).getReachable().equals(nick)) {
+				return howToReach.get(i).getInterface();
 			}
 		return null;
 	}
 
 	@Override
 	/**
-	 * This method MUST be called when the equivalent message is received,
-	 * that is, whenever a topology change occurs and a user can be reached through
-	 * another interface, different from the old one. This method is also called
-	 * whenever a new user connects to the network.
-	 * It updates the table adjusting the necessary informations.
-	 * 
-	 * @param reached the UserInformationsInterface structure holding the informations regarding
-	 * the nick which can be reached by a new interface.
-	 * @param newInterface the UserInformationsInterface structure holding the informations
-	 * regarding the new interface by which the node may be reached.
-	 */
-	public void notifyIsReachedBy(UserInformationsInterface reached,
-			UserInformationsInterface newInterface) {
-		boolean existed = false;
-		for (int i = 0; i < howToReach.size(); ++i)
-			if (howToReach.get(i).getReachable().equals(reached)) {
-				howToReach.get(i).resetInterface(newInterface);
-				existed = true;
-				break;
-			}
-		if (!existed)
-			howToReach.add(new Couple(reached, newInterface));
-	}
-
-	@Override
-	/**
 	 * This method MUST be called when the equivalent message is received.
 	 * It updates the table adjusting the necessary informations.
-	 * This is a variant of the UserInformationsInterface method, in which
-	 * the marshalled informations are passed.
 	 * 
-	 * @param reached the marhsalled UserInformationsInterface of the user which can be reached by a new interface.
-	 * @param newInterface the marshalled UserInformationsInterface of the user by which the node may be reached.
+	 * @param reached the nickname of the user which can be reached by a new interface.
+	 * @param newInterface the nickname of the user by which the node may be reached.
 	 */
 	public void notifyIsReachedBy(String reached, String newInterface) {
-		UserInformationsInterface reachedNode = new UserInformations(reached);
-		UserInformationsInterface howToReachIt = new UserInformations(newInterface);
+		String reachedNode = reached;
+		String howToReachIt = newInterface;
 		notifyIsReachedBy(reachedNode, howToReachIt);
 		
 	}
@@ -163,7 +134,7 @@ public class TableManager implements NetworkTableInterface {
 	public List<String> allMyNeighbors() {
 		List<String> result = new LinkedList<String>();
 		for (int i = 0; i < howToReach.size(); ++i) {
-			String current = howToReach.get(i).getInterface().getNick();
+			String current = howToReach.get(i).getInterface();
 			if (!result.contains((String)current) )
 				result.add(current);
 			}
@@ -181,9 +152,9 @@ public class TableManager implements NetworkTableInterface {
 	 */
 	public void hasDisconnected(String nick) {
 		for (int i = 0; i < howToReach.size(); ++i) {
-			if (howToReach.get(i).getReachable().getNick().equals(nick)) 
+			if (howToReach.get(i).getReachable().equals(nick)) 
 				howToReach.remove(i);
-			else if (howToReach.get(i).getInterface().getNick().equals(nick)) 
+			else if (howToReach.get(i).getInterface().equals(nick)) 
 				howToReach.remove(i);
 		}
 	}
@@ -199,7 +170,7 @@ public class TableManager implements NetworkTableInterface {
 	 */
 	public boolean isNearMe(String nick) {
 		for (int i = 0; i < howToReach.size(); ++i)
-			if (howToReach.get(i).getInterface().getNick().equals(nick))
+			if (howToReach.get(i).getInterface().equals(nick))
 				return true;
 		return false;
 	}
@@ -208,7 +179,7 @@ public class TableManager implements NetworkTableInterface {
 	public List<String> getConnectedNodes() {
 		List<String> result = new LinkedList<String>();
 		for (int i = 0; i < howToReach.size(); ++i) {
-			result.add(howToReach.get(i).getReachable().getNick());
+			result.add(howToReach.get(i).getReachable());
 		}
 		return result;
 	}
