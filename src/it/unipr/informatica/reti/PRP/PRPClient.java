@@ -119,14 +119,28 @@ public class PRPClient {
 			}
 		});
 		
-		//comando al gestore di cercare un nodo lilbero tra quelli salvati precedentemente al quale connettermi
-		if(!parentsManager.connect(Constants.PathOfTableBackupFile + "//" + Constants.NameOfTableBackupFile, //path del file di backup della tabella
-								Nick, //mio nick con cui autenticarmi
-								Constants.PortOfServer, //porta a cui far autenticare il server 
-								InetAddress.getByName("127.0.0.1") //mio ip
-								))
-			userInterface.PrintMessage("nessun server a cui connettersi quindi questo diventa un server principale");
+		//controllo se l'utente ha scelto di connettersi manualmente
+		if( userInterface.getConnessioneManuale())
+		{
+			if(!parentsManager.connect(userInterface.getNickManuale(), 
+								   userInterface.getPortManuale(), 
+								   userInterface.getIPManuale(), 
+								   Nick, 
+								   Constants.PortOfServer, 
+								   InetAddress.getByName("127.0.0.1") 
+								   ))
+				userInterface.PrintMessage("impossibile connettersi al server richiesto quindi questo diventa un server principale");
 			
+		}
+		else
+			//comando al gestore di cercare un nodo lilbero tra quelli salvati precedentemente al quale connettermi
+			if(!parentsManager.connect(Constants.PathOfTableBackupFile + "//" + Constants.NameOfTableBackupFile, //path del file di backup della tabella
+									Nick, //mio nick con cui autenticarmi
+									Constants.PortOfServer, //porta a cui far autenticare il server 
+									InetAddress.getByName("127.0.0.1") //mio ip
+									))
+				userInterface.PrintMessage("nessun server a cui connettersi quindi questo diventa un server principale");
+				
 	
 		//faccio partire l'interfaccia grafica
 		userInterface.StartReadingFromInput();

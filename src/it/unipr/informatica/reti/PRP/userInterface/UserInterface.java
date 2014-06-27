@@ -6,6 +6,9 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.InetAddress;
+
+import org.omg.CORBA.portable.IndirectionException;
 
 import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
@@ -16,6 +19,10 @@ public class UserInterface {
 
 	String Nick;
 	UserInterfaceCommandManager command ;
+	InetAddress ipManuale;
+	int portaManuale;
+	String nickIPManuale;
+	boolean connessioneManuale;
 	public UserInterface()
 	{
 		System.out.print("Nickname con cui registrarsi:");
@@ -59,6 +66,58 @@ public class UserInterface {
 		}
 		catch(IOException e)
 		{}
+		
+		System.out.print("collegarsi manualmente al server?(y/n):");
+		try
+		{
+			String utilizzoManuale = br.readLine();
+			System.out.println(utilizzoManuale);
+			if(utilizzoManuale.toLowerCase().equals("y")){
+				connessioneManuale = true;
+				System.out.print("indirizzo a cui connettersi:");
+				String ip = br.readLine();
+				try
+				{
+					ipManuale = InetAddress.getByName(ip);
+				}
+				catch(NumberFormatException e)
+				{
+					System.out.println("impossibile convertire il valore inserito in un indirizzo ip");
+					System.out.println("l'applicazione verra' chiusa");
+					System.exit(0);
+				}
+				
+				System.out.print("porta a cui connettersi:");
+				String portaM = br.readLine();
+				try
+				{
+					portaManuale = Integer.parseInt(portaM);
+				}
+				catch(NumberFormatException e)
+				{
+					System.out.println("impossibile convertire il valore inserito in un indirizzo di porta");
+					System.out.println("l'applicazione verra' chiusa");
+					System.exit(0);
+				}
+
+				System.out.print("nick del nodo a cui connettersi:");
+				nickIPManuale = br.readLine();
+				
+			}
+			else if(utilizzoManuale.toLowerCase().equals("n")){
+				connessioneManuale = false;
+			}
+			else
+			{
+				System.out.println("il valore inserito non e' corretto");
+				System.out.println("l'applicazione verra' chiusa");
+				System.exit(0);
+			}
+			
+		}
+		catch(IOException e)
+		{}
+		
 	}
 	
 	public void StartReadingFromInput()
@@ -90,6 +149,24 @@ public class UserInterface {
 	public void setCommand(UserInterfaceCommandManager commandManager)
 	{
 		command = commandManager;
+	}
+	public InetAddress getIPManuale()
+	{
+		return this.ipManuale;
+	}
+	public int getPortManuale()
+	{
+		return this.portaManuale;
+	}
+	
+	public boolean getConnessioneManuale()
+	{
+		return this.connessioneManuale;
+	}
+	
+	public String getNickManuale()
+	{
+		return this.nickIPManuale;
 	}
 }
 
