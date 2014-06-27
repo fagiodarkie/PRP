@@ -29,14 +29,9 @@ public class PRPClient {
 	static NetworkConnectionsManager connections ;
 	
 	public static void main(String args[]) throws UnknownHostException {
-	
-		//TODO inserire connessione manuale a padre
-		
-		
-		
 
-	tableManager = new TableManager();
-	connections = new NetworkConnectionsManager();
+		tableManager = new TableManager();
+		connections = new NetworkConnectionsManager();
 	
 		final String Nick;
 	//CREATE AND INITIALIZE USER INTERFACE

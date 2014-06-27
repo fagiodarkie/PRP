@@ -89,24 +89,8 @@ public class ParentClientManager implements ClientInterface {
 		try{
 		Socket serverSocket = new Socket(serverIP, serverPort);   
 		
-		serverCommunicationManager.SendMessage(MessageFormatter.GenerateHelloMessage(MyNick, MyIP.toString(), MyPort));
 		
-		//mi preparo per ricevere le informazioni dal padre riguardanti il suo nodo di backup
-		BufferedReader in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-		
-		//aspetto il messaggio
-		String Message = in.readLine();
-		
-		//spezzo il messaggio
-		POJOMessage pojoMessage = new POJOMessage(Message);
-		
-		if(pojoMessage.getCode().equals(Constants.MessageBackupNickCode))
-		{
-			UpdateBackupInformation(pojoMessage);
-		}
-		else
-			throw new Exception("ERRORE");
-		
+		//APRO I CANALI DI COMUNICAZIONE CON IL SERVER
 		serverCommunicationManager = new ClientCommunicationManager(serverSocket,new Command() {
 			
 			@Override
@@ -140,9 +124,40 @@ public class ParentClientManager implements ClientInterface {
 			public void manageDisconnection(String Name) {
 				command.manageDisconnection(Name);
 			}
-		});
+		},true);
 		
 		
+		
+		//TODO RIMUOVERE CODICE TEST
+		System.out.print("Messaggio inviato:");
+		System.out.println(MessageFormatter.GenerateHelloMessage(MyNick, MyIP.getHostAddress(), MyPort));
+		
+		serverCommunicationManager.SendMessage(MessageFormatter.GenerateHelloMessage(MyNick, MyIP.getHostAddress(), MyPort));
+		
+		//mi preparo per ricevere le informazioni dal padre riguardanti il suo nodo di backup
+		BufferedReader in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+		
+		
+		
+		//TODO SCOMMENTARE LA PARTE DI CODICE RIGUARDANTE LA RICEZIONE DEL BACKUP
+		/*
+		
+		//aspetto il messaggio
+		String Message = in.readLine();
+		
+		//spezzo il messaggio
+		POJOMessage pojoMessage = new POJOMessage(Message);
+		
+		if(pojoMessage.getCode().equals(Constants.MessageBackupNickCode))
+		{
+			UpdateBackupInformation(pojoMessage);
+		}
+		else
+			throw new Exception("ERRORE");
+		
+		*/
+		
+
 		return true;
 		}
 		catch(Exception ex){

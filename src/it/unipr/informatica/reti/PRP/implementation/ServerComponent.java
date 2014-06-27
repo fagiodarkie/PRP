@@ -90,24 +90,29 @@ public class ServerComponent implements ServerInterface {
 
 				});
 				
-				
-				connections.addClient(c.getNick(),c);
+				//TODO REMOVE TEST
+				System.out.println("test --> connessione alla porta accettata correttamente");
+				System.out.println("nick da aggiungere: "+ c.getNick());
 				tableManager.notifyIsReachedBy(c.getNick(), c.getNick());
+				connections.addClient(c.getNick(), c);
 
 				//ottengo tutti i nodi raggiungibili da me
 				List<String> nodi = tableManager.allMyNeighbors();
 
 				//genero il messaggio per aggiornare tutti gli altri
 				String isReachableMessage = MessageFormatter.GenerateReachableMessage(c.getNick());
-				for ( String nodo : nodi)
-				{
-					if(connections.getClient(nodo).getNick() != c.getNick())
+				if(nodi.size() > 0)
+					for ( String nodo : nodi)
 					{
-						connections.getClient(nodo).sendMessage(isReachableMessage);
+						if(nodo != null)
+						if( connections.getClient(nodo).getNick() != c.getNick())
+						{
+							connections.getClient(nodo).sendMessage(isReachableMessage);
+						}
 					}
-				}
 				/*FINE GESTIONE NEW CLIENT*/	
 			} catch (IOException e) {
+				
 				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -125,8 +130,7 @@ public class ServerComponent implements ServerInterface {
 	 */
 	@Override
 	public Boolean stop() {
-		/* FIXME perché Boolean? volevi dire boolean? è necessario un tipo di ritorno?
-		 * 
+		/* 
 		 * TODO FINE ASCOLTO
 		 * FIXME maybe like this?
 		 * 
@@ -257,6 +261,7 @@ public class ServerComponent implements ServerInterface {
 	}
 	
 	//FINE SEZIONE INVIO MESSAGGI
+	
 	/**
 	 * Manages the receiving of messages sent from the other client, parent included.
 	 *

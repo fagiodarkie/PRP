@@ -9,7 +9,7 @@ import java.util.List;
 public class MessageFormatter {
 	public static String GenerateHelloMessage(String Nick,String Ip,String Port)
 	{
-		return Constants.MessagePointToPointCode + Constants.MessagePartsDivisor +
+		return Constants.MessageHelloCode + Constants.MessagePartsDivisor +
 				Nick + Constants.MessagePartsDivisor + 
 				Ip + Constants.ConnectionInfoDivisor + 
 				Port;

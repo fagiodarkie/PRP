@@ -56,7 +56,12 @@ public class TableManager implements NetworkTableInterface {
 	 * actual map, that is looked up to get informations about the network.
 	 */
 	private List<Couple> howToReach;
-	
+
+
+	public TableManager()
+	{
+		howToReach = new LinkedList<TableManager.Couple>();
+	}
 	
 	@Override
 	/**

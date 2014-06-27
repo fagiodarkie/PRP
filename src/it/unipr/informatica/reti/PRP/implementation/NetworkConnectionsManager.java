@@ -5,8 +5,7 @@ import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
 import java.util.*;
 public class NetworkConnectionsManager {
 	
-	// FIXME is this still used? Table manager assolves all the features here proposed, better.
-
+	
 	//stato interno
 	Hashtable<String, ClientInterface> hashtableNickClient;
 	//end stato interno
@@ -26,7 +25,7 @@ public class NetworkConnectionsManager {
 	 */
 	public boolean addClient(String nick, ClientInterface newClient)
 	{
-		if(hashtableNickClient.keySet().contains(nick))
+		if(hashtableNickClient.containsKey(nick))
 			return false;
 		
 		hashtableNickClient.put(nick,newClient);
@@ -40,7 +39,7 @@ public class NetworkConnectionsManager {
 	 */
 	public boolean removeClient(String nick)
 	{
-		if(!hashtableNickClient.keySet().contains(nick))
+		if(!hashtableNickClient.containsKey(nick))
 			return false;
 		
 		hashtableNickClient.remove(nick);
@@ -49,7 +48,10 @@ public class NetworkConnectionsManager {
 	
 	public ClientInterface getClient (String nick)
 	{
-		if(!hashtableNickClient.keySet().contains(nick))
+
+		//TODO REMOVE TEST
+		System.out.println(nick);
+		if(!hashtableNickClient.containsKey(nick))
 			return null;
 		
 		return hashtableNickClient.get(nick);
@@ -58,7 +60,7 @@ public class NetworkConnectionsManager {
 	
 	public boolean sendMesage(String nick, String Message)
 	{
-		if(!hashtableNickClient.keySet().contains(nick))
+		if(!hashtableNickClient.containsKey(nick))
 			return false;
 		else
 		{

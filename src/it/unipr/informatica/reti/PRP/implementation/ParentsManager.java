@@ -55,46 +55,53 @@ public class ParentsManager {
 	{
 		try
 		{
-		parentClientManager = new ParentClientManager(Nick, Port, IP, MyNick, Integer.toString(MyPort ), MyIp, new Command() {
-			
-			@Override
-			public void manageMessage(String[] PartsOfMessage) {
-				//propago il messaggio ricevuto
-				command.manageMessage(PartsOfMessage);
+			parentClientManager = new ParentClientManager(Nick, Port, IP, MyNick, Integer.toString(MyPort ), MyIp, new Command() {
 				
-			}
-			
-			@Override
-			public void manageMessage(String Message, String Client) {
-				//propago il messaggio ricevuto
-				command.manageMessage(Message, Client);
-				
-			}
-			
-			@Override
-			public void manageDisconnection(String Name) {
-				//per prima cosa propago il messaggio 
-				command.manageDisconnection(Name);
-				//successivamente mi connetto al nodo di backup
-				try
-				{
-					riconnetti();
-				}
-				catch(Exception e)
-				{
-					//DO NOTHING in this case we lost the server's slice of network 
+				@Override
+				public void manageMessage(String[] PartsOfMessage) {
+					//propago il messaggio ricevuto
+					command.manageMessage(PartsOfMessage);
+					
 				}
 				
-			}
-		}, this);
+				@Override
+				public void manageMessage(String Message, String Client) {
+					//propago il messaggio ricevuto
+					command.manageMessage(Message, Client);
+					
+				}
+				
+				@Override
+				public void manageDisconnection(String Name) {
+					//per prima cosa propago il messaggio 
+					command.manageDisconnection(Name);
+					//successivamente mi connetto al nodo di backup
+					try
+					{
+						riconnetti();
+					}
+					catch(Exception e)
+					{
+						
+						//DO NOTHING in this case we lost the server's slice of network 
+					}
+					
+				}
+			}, this);
+			parentClientManager.connect(MyNick);
 		}catch (Exception ex)
 		{
 			return false;
 		}
 		//avviso che il genitore è raggiungibile tramite me
+		//TODO SCOMMENTARE SEZIONE INSERIMENTO IN TABELLA CLIENT
+		/*
 		command.manageMessage(MessageFormatter.GenerateReachableMessage(parentClientManager.getNick()), parentClientManager.MyNick);
 		tableManager.notifyIsReachedBy(parentClientManager.getNick(), parentClientManager.getNick());
 		connectionsManager.addClient(parentClientManager.getNick(),parentClientManager);
+		*/
+		//TODO REMOVE TEST
+		System.out.print("test--> connessione al padre avvenuta con successo");
 		return true;
 	}
 	

@@ -22,14 +22,16 @@ public class ClientCommunicationManager implements ClientCommunicationManagerInt
 	 * @param comandoGestioneMessaggi the controller
 	 * @throws Exception
 	 */
-	public ClientCommunicationManager(Socket socket,Command comandoGestioneMessaggi) throws Exception
+	public ClientCommunicationManager(Socket socket,Command comandoGestioneMessaggi,boolean isDad) throws Exception
 	{
 		//creo il worker da passare al thread per la gestione della ocmunicazione
 	    clientWorker = new ClientWorker(
-	    		new BufferedReader(new 
-	    			      InputStreamReader(socket.getInputStream())),
-			      new PrintWriter(socket.getOutputStream(), true),
-			      comandoGestioneMessaggi,this);
+	    								new BufferedReader(new 
+	    												InputStreamReader(socket.getInputStream())),
+	    								new PrintWriter(socket.getOutputStream(), true),
+	    								comandoGestioneMessaggi,
+	    								this,
+	    								isDad);
 	    //creo il thread per la gestione della comunicazione in parallelo
 		t= new Thread(clientWorker);
 		//faccio partire il thread
@@ -87,31 +89,43 @@ class ClientWorker implements Runnable {
 		      InputStreamReader(client.getInputStream()));
 		    out = new 
 		      PrintWriter(client.getOutputStream(), true); 
+		    
+		    //TODO IMPLEMENTARE GESTIONE ARRIVO HELLO NON ANCORA FATTO ma questo costruttore non lo usiamo...
 		  } catch (IOException e) {
 		   comando.manageDisconnection("");
 		   e.printStackTrace();
 		  }
 	  }
-	public ClientWorker(BufferedReader input,PrintWriter output,Command comando,ClientCommunicationManager clientManager) throws Exception {
+	
+	public ClientWorker(BufferedReader input,PrintWriter output,Command comando,ClientCommunicationManager clientManager, boolean isDad) throws Exception {
 		in = input;
 		out = output;
 		command=comando;
 
 		  this.clientMan = clientManager;
-		message = in.readLine();
-		String partsOfMessage[] = message.split(Constants.MessagePartsDivisor);
-		if(partsOfMessage[0].contains(Constants.MessageHelloCode))
+		  // TODO  SCOMMENTARE SEZIONE RICEZIONE MESSAGGIO HELLO
+		  
+		if(!isDad)
 		{
-			comando.manageMessage(partsOfMessage);
+			message = in.readLine();
+			//TODO REMOVE CODICE TEST
+			System.out.println("Messaggio ricevuto: " + message);
+			String partsOfMessage[] = message.split(Constants.MessagePartsDivisor);
+			
+			//TODO REMOVE CODE TEST
+			System.out.println(partsOfMessage[0]);
+			if(partsOfMessage[0].equals(Constants.MessageHelloCode))
+			{
+				comando.manageMessage(partsOfMessage);
+			}
+			else
+				throw new Exception("ERRORE");
 		}
-		else
-			throw new Exception("ERRORE");
 	}
 	
 	public void run(){
 		
 	
-	  //leggo il primo messaggio che deve essere un HELLO
 	  try {
 		message = in.readLine();
 		
