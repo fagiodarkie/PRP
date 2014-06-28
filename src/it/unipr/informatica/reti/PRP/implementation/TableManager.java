@@ -2,7 +2,6 @@ package it.unipr.informatica.reti.PRP.implementation;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import it.unipr.informatica.reti.PRP.interfaces.NetworkTableInterface;
 
 public class TableManager implements NetworkTableInterface {
@@ -117,11 +116,17 @@ public class TableManager implements NetworkTableInterface {
 	 * @param reached the nickname of the user which can be reached by a new interface.
 	 * @param newInterface the nickname of the user by which the node may be reached.
 	 */
-	public void notifyIsReachedBy(String reached, String newInterface) {
-		String reachedNode = reached;
-		String howToReachIt = newInterface;
-		notifyIsReachedBy(reachedNode, howToReachIt);
-		
+	public void notifyIsReachedBy(String reached,
+			String newInterface) {
+		boolean existed = false;
+		for (int i = 0; i < howToReach.size(); ++i)
+			if (howToReach.get(i).getReachable().equals(reached)) {
+				howToReach.get(i).resetInterface(newInterface);
+				existed = true;
+				break;
+			}
+		if (!existed)
+			howToReach.add(new Couple(reached, newInterface));
 	}
 	
 	/**
@@ -151,10 +156,9 @@ public class TableManager implements NetworkTableInterface {
 	 * @param nick the nickname of the user who disconnected.
 	 */
 	public void hasDisconnected(String nick) {
-		for (int i = 0; i < howToReach.size(); ++i) {
-			if (howToReach.get(i).getReachable().equals(nick)) 
-				howToReach.remove(i);
-			else if (howToReach.get(i).getInterface().equals(nick)) 
+		for (int i = howToReach.size() -1; i >= 0; --i) {
+			if (howToReach.get(i).getReachable().equals(nick)
+				|| howToReach.get(i).getInterface().equals(nick)) 
 				howToReach.remove(i);
 		}
 	}
