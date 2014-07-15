@@ -9,11 +9,12 @@ public interface NetworkTableInterface {
 	 * Also notify user connection and disconnection. 
 	 */
 	public boolean isItConnected(String nick);
-	public String getInfoByNick(String nick);
+	public UserInformationsInterface getInfoByNick(String nick);
 	public String howToReach(String nick);
 	public void notifyIsReachedBy(String reached, String newInterface);
 	public void hasDisconnected(String nick);
 	public boolean isNearMe(String nick);
 	public List<String> getConnectedNodes();
 	public List<String> allMyNeighbors();
+	void insertNode(UserInformationsInterface informations);
 }

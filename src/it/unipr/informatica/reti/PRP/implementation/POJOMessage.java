@@ -2,7 +2,6 @@ package it.unipr.informatica.reti.PRP.implementation;
 
 import java.security.Timestamp;
 
-import it.unipr.informatica.reti.PRP.interfaces.MessageCode;
 import it.unipr.informatica.reti.PRP.interfaces.MessageInterface;
 import it.unipr.informatica.reti.PRP.utils.Constants;
 
@@ -14,7 +13,7 @@ public class POJOMessage implements MessageInterface {
 	private String data;
 
 	/**
-	 * Message implementation: informations about
+	 * POJOMessage implementation: informations about
 	 * - sender
 	 * - destination
 	 * - message type
@@ -30,6 +29,7 @@ public class POJOMessage implements MessageInterface {
 		data = "";
 		
 	}
+
 	public POJOMessage(String Message) throws Exception{
 		
 		this();
@@ -71,22 +71,22 @@ public class POJOMessage implements MessageInterface {
 				break;
 			
 			case Constants.MessageBackupNickCode:
-				if(partsOfMessaggio.length < 2)
+				if(partsOfMessaggio.length < 4)
 					throw new Exception("messaggio non valido");
 				else{
-					data = data;
-					sender = "";
+					data = partsOfMessaggio[2] + ":" + partsOfMessaggio[3]; // IP:Port
+					sender = partsOfMessaggio[1];
 					receiver = "";
 					
 				}
 				break;
 				
 			case Constants.MessageReachableCode:
-				if(partsOfMessaggio.length < 3)
+				if(partsOfMessaggio.length < 2)
 					throw new Exception("messaggio non valido");
 				else{
 					sender = partsOfMessaggio[1];
-					data = partsOfMessaggio[2];
+					data = "";
 					receiver = "";
 					
 				}
@@ -157,7 +157,7 @@ public class POJOMessage implements MessageInterface {
 	 */
 	@Override
 	public Timestamp getTimestamp() {
-		// TODO Auto-generated method stub
+		// TODO optional feature
 		return null;
 	}
 	
@@ -180,6 +180,5 @@ public class POJOMessage implements MessageInterface {
 	public String getData() {
 		return data;
 	}
-
 	
 }

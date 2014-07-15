@@ -46,7 +46,7 @@ public class ParentClientManager implements ClientInterface {
 		try {
 			backupIP = InetAddress.getByName(ipAndPort[0]);
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
+			// ora come ora, se va male il peggio che può succedere è che non sappiamo a chi connetterci: amen.
 			e.printStackTrace();
 		}
 		backupPort = Integer.parseInt(ipAndPort[1]);
@@ -62,10 +62,9 @@ public class ParentClientManager implements ClientInterface {
 	 * @param MyNick our nickname.
 	 * @param MyPort our listen port.
 	 * @param MyIP our listen address.
-	 * @param command (?)
-	 * @param parentsManager the manager of our first connection.
+	 * @param command
 	 */
-	public ParentClientManager(String Nick,int Port,InetAddress IP,String MyNick,String MyPort,InetAddress MyIP,Command command,ParentsManager parentsManager)
+	public ParentClientManager(String Nick,int Port,InetAddress IP,String MyNick,String MyPort,InetAddress MyIP,Command command)
 	{
 		this.serverIP = IP;
 		this.serverPort = Port;
@@ -84,83 +83,64 @@ public class ParentClientManager implements ClientInterface {
 	 * @return true if all went well. False otherwise
 	 * @throws Exception if the message does not contain the backup nickname.
 	 */
-	public boolean connect(String Nick) throws Exception
+	public boolean connect() throws Exception
 	{
 		try{
-		Socket serverSocket = new Socket(serverIP, serverPort);   
-		
-		
-		//APRO I CANALI DI COMUNICAZIONE CON IL SERVER
-		serverCommunicationManager = new ClientCommunicationManager(serverSocket,new Command() {
+			Socket serverSocket = new Socket(serverIP, serverPort);   
 			
-			@Override
-			public void manageMessage(String[] PartsOfMessage) {
-				// TODO Auto-generated method stub
-				
-			}
 			
-			@Override
-			public void manageMessage(String Message, String Client) {
-
-				POJOMessage pojoMessage;
-				try {
-					pojoMessage = new POJOMessage(Message);
+			//APRO I CANALI DI COMUNICAZIONE CON IL SERVER
+			serverCommunicationManager = new ClientCommunicationManager(serverSocket,new Command() {
 				
-				
-				if( pojoMessage.getCode().equals(Constants.MessageBackupNickCode))
-				{
-					UpdateBackupInformation(pojoMessage);
-				}
-				else
-					command.manageMessage(Message, Client);
-				} catch (Exception e) {
-					// TODO gestire errore messaggio non valido
-					e.printStackTrace();
+				@Override
+				public void manageMessage(String[] PartsOfMessage) {
+					command.manageMessage(PartsOfMessage);
+					
 				}
 				
-			}
+				@Override
+				public void manageMessage(String Message, String Client) {
+	
+					POJOMessage pojoMessage;
+					try {
+						pojoMessage = new POJOMessage(Message);
+					
+					
+						if( pojoMessage.getCode().equals(Constants.MessageBackupNickCode))
+						{
+							UpdateBackupInformation(pojoMessage);
+						}
+						else command.manageMessage(Message, Client);
+					} catch (Exception e) {
+						// TODO gestire errore messaggio non valido
+						e.printStackTrace();
+					}
+					
+				}
+				
+				@Override
+				public void manageDisconnection(String Name) {
+					command.manageDisconnection(Name);
+				}
+			},true);
 			
-			@Override
-			public void manageDisconnection(String Name) {
-				command.manageDisconnection(Name);
-			}
-		},true);
-		
-		
-		
-		//TODO RIMUOVERE CODICE TEST
-		System.out.print("Messaggio inviato:");
-		System.out.println(MessageFormatter.GenerateHelloMessage(MyNick, MyIP.getHostAddress(), MyPort));
-		
-		serverCommunicationManager.SendMessage(MessageFormatter.GenerateHelloMessage(MyNick, MyIP.getHostAddress(), MyPort));
-		
-		//mi preparo per ricevere le informazioni dal padre riguardanti il suo nodo di backup
-		BufferedReader in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-		
-		
-		
-		//TODO SCOMMENTARE LA PARTE DI CODICE RIGUARDANTE LA RICEZIONE DEL BACKUP
-		/*
-		
-		//aspetto il messaggio
-		String Message = in.readLine();
-		
-		//spezzo il messaggio
-		POJOMessage pojoMessage = new POJOMessage(Message);
-		
-		if(pojoMessage.getCode().equals(Constants.MessageBackupNickCode))
-		{
-			UpdateBackupInformation(pojoMessage);
-		}
-		else
-			throw new Exception("ERRORE");
-		
-		*/
-		
-
-		return true;
+			
+			
+			
+			serverCommunicationManager.SendMessage(MessageFormatter.GenerateHelloMessage(MyNick, MyIP.getHostAddress(), MyPort));
+			
+			//TODO RIMUOVERE CODICE TEST
+			System.out.print("Messaggio inviato:");
+			System.out.println(MessageFormatter.GenerateHelloMessage(MyNick, MyIP.getHostAddress(), MyPort));
+			
+			//mi preparo per ricevere le informazioni dal padre riguardanti il suo nodo di backup
+			BufferedReader in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+			
+			
+			return true;
 		}
 		catch(Exception ex){
+			ex.printStackTrace();
 			return false;
 		}
 	}
@@ -184,6 +164,10 @@ public class ParentClientManager implements ClientInterface {
 		return serverCommunicationManager.SendMessage(Message);
 	}
 
+	@Override
+	public void stop() {
+		serverCommunicationManager.stopListening();
+	}
 }
 
 

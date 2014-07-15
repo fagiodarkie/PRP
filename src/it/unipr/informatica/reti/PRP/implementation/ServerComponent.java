@@ -1,15 +1,13 @@
-package it.unipr.informatica.reti.PRP.implementation;
+	package it.unipr.informatica.reti.PRP.implementation;
 
 import java.io.*;
 import java.net.*;
-import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.interfaces.ClientCommunicationManagerInterface;
 import it.unipr.informatica.reti.PRP.interfaces.ServerInterface;
-import it.unipr.informatica.reti.PRP.interfaces.UserInterfaceCommandManager;
 import it.unipr.informatica.reti.PRP.utils.Constants;
 import it.unipr.informatica.reti.PRP.utils.MessageFormatter;
 
@@ -18,9 +16,11 @@ public class ServerComponent implements ServerInterface {
 
 	//START STATO INTERNO
 	private ServerSocket serverSocket;
-	TableManager tableManager ;
-	ClientCommunicationManagerInterface commandClientCommunicationManagerInterface;
-	NetworkConnectionsManager connections;
+	private TableManager tableManager ;
+	private ClientCommunicationManagerInterface commandClientCommunicationManagerInterface;
+	private NetworkConnectionsManager connections;
+	private boolean accept;
+	private String nick;
 	//END STATO INTERNO
 
 	//START CONSTRUCTOR
@@ -32,11 +32,12 @@ public class ServerComponent implements ServerInterface {
 	 * @param connessioni the connection manager through which the server component should communicate
 	 * @param command the component from which the server component is taking orders (?).
 	 */
-	public ServerComponent(TableManager manager,NetworkConnectionsManager connessioni, ClientCommunicationManagerInterface command)
+	public ServerComponent(TableManager manager,NetworkConnectionsManager connessioni, ClientCommunicationManagerInterface command, String nick)
 	{
 		this.tableManager = manager;
 		this.commandClientCommunicationManagerInterface = command;
 		this.connections = connessioni;
+		this.nick = nick;
 	}
 	//END CONSTRUCTOR
 
@@ -58,14 +59,7 @@ public class ServerComponent implements ServerInterface {
 		}
 		System.out.println("connessione alla porta avvenuta con successo");
 
-		/* FIXME maybe like this?
-		 * 
-		 * declare accept as private boolean in the class members;
-		 * 
-		 * accept = true;
-		 * while (accept) {
-		 */
-		while(true){
+		while(accept){
 			try {
 				ClientManager c = new ClientManager(serverSocket.accept(), new Command() {
 
@@ -94,6 +88,7 @@ public class ServerComponent implements ServerInterface {
 				System.out.println("test --> connessione alla porta accettata correttamente");
 				System.out.println("nick da aggiungere: "+ c.getNick());
 				tableManager.notifyIsReachedBy(c.getNick(), c.getNick());
+				tableManager.insertNode(new UserInformations(c.getNick(), c.getPort(), c.getIP()));
 				connections.addClient(c.getNick(), c);
 
 				//ottengo tutti i nodi raggiungibili da me
@@ -130,13 +125,8 @@ public class ServerComponent implements ServerInterface {
 	 */
 	@Override
 	public Boolean stop() {
-		/* 
-		 * TODO FINE ASCOLTO
-		 * FIXME maybe like this?
-		 * 
-		 * accept = false;
-		 * connections.stopListening(); // this must be implemented
-		 */
+		accept = false;
+		connections.stopListening();
 		return null;
 	}
 	//END CONNECTION MANAGEMENT METHOD
@@ -145,10 +135,10 @@ public class ServerComponent implements ServerInterface {
 	/**
 	 * Manages the messages coming from the interface, redirecting or processing them.
 	 * 
-	 * @param Message the message to be processed.
+	 * @param POJOMessage the message to be processed.
 	 * @param MyNick nickname to which the message should be sent, if any (?)
 	 */
-	public void ManageMessageFromUserInterface(String Message,String MyNick)
+	public void ManageMessageFromUserInterface(String Message)
 	{
 		
 
@@ -182,7 +172,6 @@ public class ServerComponent implements ServerInterface {
 			
 			//TODO remove test code
 			commandClientCommunicationManagerInterface.SendMessage("il messaggio e': "+Messaggio);
-			
 			boolean broadcast = false;
 			for(String c : Commands)
 			{
@@ -195,7 +184,7 @@ public class ServerComponent implements ServerInterface {
 			
 			if(broadcast)
 			{
-				//sendBroadcast(Messaggio);
+				sendBroadcast(Messaggio);
 				//TODO remove test code.
 				commandClientCommunicationManagerInterface.SendMessage("messaggio broadcast");
 			}
@@ -203,7 +192,7 @@ public class ServerComponent implements ServerInterface {
 			{
 				for(String nick : Commands)
 				{
-					//sendPointToPoint(Messaggio, nick);
+					sendPointToPoint(Messaggio, nick);
 					//TODO remove test code
 					commandClientCommunicationManagerInterface.SendMessage("messaggio diretto a:" + nick);
 				}
@@ -222,42 +211,45 @@ public class ServerComponent implements ServerInterface {
 	//INIZIO SEZIONE INVIO MESSAGGI
 	/**
 	 * permette di inviare un messaggio a tutti i nodi vicini
-	 * @param Message messaggio da inviare
+	 * @param POJOMessage messaggio da inviare
 	 */
 	private void sendBroadcast(String Message)
 	{
 		for(String nick : tableManager.allMyNeighbors())
 		{
-				connections.getClient(nick).sendMessage(Message);
+			String newMessage = MessageFormatter.GenerateBroadcastMessage(nick, Message);
+			connections.getClient(nick).sendMessage(newMessage);
 		}
 	}
 
 	/**
 	 * permette d'inviare un messaggio a tutti  i nodi vicini tranne a nickNoNA
-	 * @param Message messagio da inviare
+	 * @param POJOMessage messagio da inviare
 	 * @param nickNoNA nick a cui non inviarlo
 	 */
 	private void sendBroadcast(String Message, String nickNoNA)
 	{
 
-		for(String nick : tableManager.allMyNeighbors())
+		for(String sendToNick : tableManager.allMyNeighbors())
 		{
-			if(nick != nickNoNA)
+			if(sendToNick != nickNoNA)
 			{
-				connections.getClient(nick).sendMessage(Message);
+				String newMessage = MessageFormatter.GeneratePointToPointMessage(nick, sendToNick, Message);
+				connections.getClient(sendToNick).sendMessage(newMessage);
 			}
 		}
 	}
 	
 	/**
 	 * invia un messaggio ad un utente
-	 * @param Message messaggio da inviare
+	 * @param POJOMessage messaggio da inviare
 	 * @param Nick nickname dell'utente a cui inviarlo
 	 */
-	private void sendPointToPoint(String Message, String Nick)
+	private void sendPointToPoint(String Message, String sendToNick)
 	{
 		//lo devo mandare sulla linea corretta
-		connections.sendMesage(Nick, Message);
+		String newMessage = MessageFormatter.GeneratePointToPointMessage(nick, sendToNick, Message);
+		connections.sendMessage(sendToNick, newMessage);
 	}
 	
 	//FINE SEZIONE INVIO MESSAGGI
@@ -265,7 +257,7 @@ public class ServerComponent implements ServerInterface {
 	/**
 	 * Manages the receiving of messages sent from the other client, parent included.
 	 *
-	 * @param Message received message
+	 * @param POJOMessage received message
 	 * @param Client nickname of the client who sent the message.
 	 */
 	public void ManageMessage(String Message,String Client)
@@ -316,45 +308,24 @@ public class ServerComponent implements ServerInterface {
 			
 			/*messaggio BACKUP NICK   */
 			case Constants.MessageBackupNickCode:
-				//DO NOTHING ONLY PARENT CAN SEND BACKUP NICK
+				//DO NOTHING: ONLY PARENT CAN SEND BACKUP NICK
 			break;
 			
 			
 			
 			/*messaggio REACHABLE     */
 			case Constants.MessageReachableCode :
+				String isReachableMessage = MessageFormatter.GenerateReachableMessage(messageManagement.getData());
+				sendBroadcast(isReachableMessage, Client);
+				tableManager.notifyIsReachedBy(messageManagement.getData(), Client);
 				
-
-				if(!tableManager.isItConnected(messageManagement.getData()))
-				{
-
-					String isReachableMessage = MessageFormatter.GenerateReachableMessage(messageManagement.getData());
-					for(String nick : tableManager.allMyNeighbors())
-					{
-						if(nick != Client)
-						{
-							connections.getClient(nick).sendMessage(isReachableMessage);
-						}
-					}
-				}
-				else
-				{
-					//DO NOTHING 
-				}
-				break;
 			/*messaggio NOT REACHABLE */
 				case Constants.MessageNotReachableCode :
 					if(tableManager.isItConnected(messageManagement.getData()))
 					{
-	
+						tableManager.hasDisconnected(messageManagement.getData());
 						String isNotReachableMessage = MessageFormatter.GenerateNotReachableMessage(messageManagement.getData());
-						for(String nick : tableManager.allMyNeighbors())
-						{
-							if(nick != Client)
-							{
-								connections.getClient(nick).sendMessage(isNotReachableMessage);
-							}
-						}
+						sendBroadcast(isNotReachableMessage);
 					}
 					else
 					{
@@ -362,6 +333,7 @@ public class ServerComponent implements ServerInterface {
 					} 
 
 				break;
+				
 			/*messaggio TABLE   */      
 				case Constants.MessageTableCode:
 					
@@ -373,22 +345,13 @@ public class ServerComponent implements ServerInterface {
 					
 					//le informazioni devono essere per forza un multiplo di 3
 					if(Rows.length % 3 != 0)
-						throw new Exception("errore messaggio tabella ( i dati riguardanti la tabella non sono in numero pari)");
+						throw new Exception("errore messaggio tabella (i dati riguardanti la tabella non sono multipli di 3)");
 					
 					//per ogni terna d'informazioni aggiorno la tabella
 					for(int i = 0 ; i < Rows.length ; i += 3 )
 					{
-						/*if(!tableManager.isItConnected(Rows[i]))
-							tableManager.notifyIsReachedBy(tableManager.getInfoByNick(Client),
-														new UserInformations(Rows[i], Integer.parseInt(Rows[i + 1]), InetAddress.getByName(Rows[i + 2])));
-						else
-							{
-							tableManager.notifyIsReachedBy(tableManager.getInfoByNick(Client),
-									new UserInformations(Rows[i], Integer.parseInt(Rows[i + 1]), InetAddress.getByName(Rows[i + 2])));
-
-							}*/
-						tableManager.notifyIsReachedBy(tableManager.getInfoByNick(Client),
-								new UserInformations(Rows[i], Integer.parseInt(Rows[i + 1]), InetAddress.getByName(Rows[i + 2])));
+						tableManager.notifyIsReachedBy(Client, Rows[i]);
+						tableManager.insertNode(new UserInformations(Rows[i], Integer.parseInt(Rows[i + 1]), InetAddress.getByName(Rows[i + 2])));
 					}
 					
 					//genero il messaggio riguardante la mia tabella
@@ -403,7 +366,7 @@ public class ServerComponent implements ServerInterface {
 					for(String nick : myNeighbors)
 					{
 						//invio la tabella agli altri nodi vicini
-						connections.sendMesage(nick, MyTable);
+						connections.sendMessage(nick, MyTable);
 					}
 					
 				break;

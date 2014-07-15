@@ -3,15 +3,8 @@ package it.unipr.informatica.reti.PRP;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.Savepoint;
 import java.util.*;
-
-import javax.jws.soap.SOAPBinding.Use;
-
-import com.sun.org.apache.xalan.internal.lib.NodeInfo;
-
 import it.unipr.informatica.reti.PRP.implementation.NetworkConnectionsManager;
-import it.unipr.informatica.reti.PRP.implementation.ParentClientManager;
 import it.unipr.informatica.reti.PRP.implementation.ParentsManager;
 import it.unipr.informatica.reti.PRP.implementation.ServerComponent;
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
@@ -34,13 +27,13 @@ public class PRPClient {
 		connections = new NetworkConnectionsManager();
 	
 		final String Nick;
-	//CREATE AND INITIALIZE USER INTERFACE
+		//CREATE AND INITIALIZE USER INTERFACE
 		
 		final UserInterface userInterface = new UserInterface();
 		
 		Nick = userInterface.getNick();
 		
-	//CREATE SERVER LISTENER
+		//CREATE SERVER LISTENER
 		final ServerComponent serverComponent = new ServerComponent(tableManager,connections, new ClientCommunicationManagerInterface() {
 			
 			@Override
@@ -48,7 +41,7 @@ public class PRPClient {
 				userInterface.PrintMessage(Message);
 				return null;
 			}
-		});
+		}, Nick);
 		
 		userInterface.setCommand(new UserInterfaceCommandManager() {
 			
@@ -65,11 +58,11 @@ public class PRPClient {
 						break;
 					
 					case "HELP":
-						userInterface.PrintMessage("PRPClient coded by Alessio Bortolotti and Jacopo Freddi");
-						userInterface.PrintMessage("@nick message --> send message to user with the nickname equals to nick");
-						userInterface.PrintMessage("@broadcast message --> send message to all user");
-						userInterface.PrintMessage("nicks list --> get the list of user");
-						userInterface.PrintMessage("exit --> exit from the chat network");
+						userInterface.PrintMessage("PRPClient coded by Alessio Bortolotti and Jacopo Freddi\n");
+						userInterface.PrintMessage("@nick message		: send message to user with the nickname equals to nick");
+						userInterface.PrintMessage("@broadcast message	: send message to all user");
+						userInterface.PrintMessage("nicks list			: get the list of connected users");
+						userInterface.PrintMessage("exit				: exit from the chat network");
 						userInterface.PrintMessage("!!!WARNING: nick are case sensitive!!!");
 						break;
 					
@@ -83,7 +76,7 @@ public class PRPClient {
 						break;
 						
 					default:
-						serverComponent.ManageMessageFromUserInterface(Message, Nick);
+						serverComponent.ManageMessageFromUserInterface(Message);
 						
 					
 					}
@@ -98,7 +91,6 @@ public class PRPClient {
 			@Override
 			public void manageMessage(String[] PartsOfMessage) {
 				//DO NOTHING 
-				
 			}
 			
 			@Override
@@ -124,8 +116,7 @@ public class PRPClient {
 								   Constants.PortOfServer, 
 								   InetAddress.getByName("127.0.0.1") 
 								   ))
-				userInterface.PrintMessage("impossibile connettersi al server richiesto quindi questo diventa un server principale");
-			
+				userInterface.PrintMessage("impossibile connettersi al server richiesto: il presente nodo sta per diventare un server principale");
 		}
 		else
 			//comando al gestore di cercare un nodo lilbero tra quelli salvati precedentemente al quale connettermi
@@ -134,17 +125,14 @@ public class PRPClient {
 									Constants.PortOfServer, //porta a cui far autenticare il server 
 									InetAddress.getByName("127.0.0.1") //mio ip
 									))
-				userInterface.PrintMessage("nessun server a cui connettersi quindi questo diventa un server principale");
-				
+				userInterface.PrintMessage("nessun server a cui connettersi: il presente nodo sta per diventare un server principale");
 	
 		//faccio partire l'interfaccia grafica
 		userInterface.StartReadingFromInput();
 		
-		
 		//faccio partire il ServerInterface:
 		serverComponent.start();
 	}
-	
 	
 	public static void SaveTable()
 	{
@@ -154,6 +142,7 @@ public class PRPClient {
 		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(Constants.PathOfTableBackupFile+"//"+Constants.NameOfTableBackupFile, true)))) {
 			for(String nick : listaNick)
 			{
+				
 				UserInformationsInterface nodeInfo = tableManager.getInfoByNick(nick);
 				
 				out.println(nodeInfo.getNick() + Constants.FileBackupInformationDivisor + 
@@ -166,4 +155,4 @@ public class PRPClient {
 		
 		
 	}
-	}
+}

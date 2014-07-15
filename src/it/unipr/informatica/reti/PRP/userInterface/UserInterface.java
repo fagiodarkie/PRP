@@ -1,17 +1,9 @@
 package it.unipr.informatica.reti.PRP.userInterface;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.InetAddress;
-
-import org.omg.CORBA.portable.IndirectionException;
-
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
-
 import it.unipr.informatica.reti.PRP.interfaces.UserInterfaceCommandManager;
 import it.unipr.informatica.reti.PRP.utils.Constants;
 
@@ -33,39 +25,46 @@ public class UserInterface {
 		}
 		catch(IOException e)
 		{}
-		System.out.print("utilizzare la porta di defalut \""+Constants.PortOfServer+"\"(y/n):");
-		try
+		System.out.print("utilizzare la porta di defalut \""+Constants.PortOfServer+"\"? (y/n):");
+		boolean portaDecisa = false;
+		do
 		{
-			String utilizzoporta = br.readLine();
-			System.out.println(utilizzoporta);
-			if(utilizzoporta.toLowerCase().equals("y")){
-				System.out.println("verra' utilizzata la porta di default");
-			}
-			else if(utilizzoporta.toLowerCase().equals("n")){
-				System.out.print("porta da utilizzare:");
-				String port = br.readLine();
-				try
-				{
-					Constants.PortOfServer = Integer.parseInt(port);
+			try{
+				String utilizzoporta = br.readLine();
+				System.out.println(utilizzoporta);
+				if(utilizzoporta.toLowerCase().equals("y")){
+					System.out.println("verra' utilizzata la porta di default");
+					portaDecisa = true;
 				}
-				catch(NumberFormatException e)
-				{
-					System.out.println("impossibile convertire il valore inserito in un numero di porta");
-					System.out.println("l'applicazione verra' chiusa");
-					System.exit(0);
+				else if(utilizzoporta.toLowerCase().equals("n")){
+					System.out.print("porta da utilizzare:");
+					String port = br.readLine();
+					try
+					{
+						Constants.PortOfServer = Integer.parseInt(port);
+					}
+					catch(NumberFormatException e)
+					{
+						System.out.println("impossibile convertire il valore inserito in un numero di porta");
+						System.out.println("l'applicazione verra' chiusa");
+						System.exit(0);
+					}
+	
+					System.out.println("porta di ascolto impostata a:"+Constants.PortOfServer);
+					portaDecisa = true;
 				}
-
-				System.out.println("porta di ascolto impostata a:"+Constants.PortOfServer);
-			}
-			else
-			{
+				else
+				{
+					System.out.println("Rispondere y o n");
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
 				System.out.println("il valore inserito non e' corretto");
 				System.out.println("l'applicazione verra' chiusa");
 				System.exit(0);
 			}
 		}
-		catch(IOException e)
-		{}
+		while(!portaDecisa);
 		
 		System.out.print("collegarsi manualmente al server?(y/n):");
 		try
@@ -136,7 +135,7 @@ public class UserInterface {
 	
 	/**
 	 * send the message to the output stream
-	 * @param Message
+	 * @param POJOMessage
 	 */
 	public void PrintMessage(String Message)
 	{	System.out.println(Message);

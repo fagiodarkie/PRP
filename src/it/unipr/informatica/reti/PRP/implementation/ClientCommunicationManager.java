@@ -57,9 +57,7 @@ public class ClientCommunicationManager implements ClientCommunicationManagerInt
 	 */
 	public void stopListening()
 	{
-		
-		t.stop();
-		// TODO check if t.interrupt(); works as well, as it is not deprecated
+		t.interrupt();
 	}
 	
 }
@@ -73,6 +71,7 @@ class ClientWorker implements Runnable {
 	 * Thread implementing connectivity between our client and another user's. 
 	 */
 	
+	@SuppressWarnings("unused")
 	private Socket client;
 	BufferedReader in = null;
 	PrintWriter out = null;
@@ -102,9 +101,8 @@ class ClientWorker implements Runnable {
 		out = output;
 		command=comando;
 
-		  this.clientMan = clientManager;
-		  // TODO  SCOMMENTARE SEZIONE RICEZIONE MESSAGGIO HELLO
-		  
+		this.clientMan = clientManager;
+		
 		if(!isDad)
 		{
 			message = in.readLine();
@@ -158,8 +156,8 @@ class ClientWorker implements Runnable {
 	public Boolean sendMessage(String Message)
 	{
 		  try{
-		  out.println(Message);
-		  return true;
+			  out.println(Message);
+			  return true;
 		  }
 		  catch(Exception e)
 		  {

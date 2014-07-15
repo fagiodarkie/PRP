@@ -11,11 +11,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 public class ParentsManager {
 	
@@ -31,7 +28,7 @@ public class ParentsManager {
 	 * 
 	 * @param connectionsManager the connections manager to which it should communicate topology changes and messages
 	 * @param tableManager the table manager to which notifications should be given.
-	 * @param command (?)
+	 * @param command 
 	 */
 	public ParentsManager(NetworkConnectionsManager connectionsManager,TableManager tableManager, Command command)
 	{
@@ -87,32 +84,30 @@ public class ParentsManager {
 					}
 					
 				}
-			}, this);
-			parentClientManager.connect(MyNick);
+			});
+			parentClientManager.connect();
 		}catch (Exception ex)
 		{
 			return false;
 		}
 		//avviso che il genitore è raggiungibile tramite me
-		//TODO SCOMMENTARE SEZIONE INSERIMENTO IN TABELLA CLIENT
-		/*
+		
 		command.manageMessage(MessageFormatter.GenerateReachableMessage(parentClientManager.getNick()), parentClientManager.MyNick);
 		tableManager.notifyIsReachedBy(parentClientManager.getNick(), parentClientManager.getNick());
 		connectionsManager.addClient(parentClientManager.getNick(),parentClientManager);
-		*/
 		//TODO REMOVE TEST
 		System.out.print("test--> connessione al padre avvenuta con successo");
 		return true;
 	}
 	
 	/**
-	 * prova a connettersi a tutti i nodi presenti nel file di backup e il primo disponibile lo utilizza come padre
-	 * @param File
-	 * @param MyNick
-	 * @param MyPort
-	 * @param MyIp
-	 * @throws UnknownHostException 
-	 * @throws NumberFormatException 
+	 * Tries to connect to every node specified in the backup file: the first available node is kept as father.
+	 * @param File URL to the backup file
+	 * @param MyNick the internal nickname
+	 * @param MyPort the internal listen port
+	 * @param MyIp the internal IP address
+	 * @throws UnknownHostException if the chosen node is unavailable
+	 * @throws NumberFormatException if the file is not properly formatted
 	 */
 	public Boolean connect(String File, String MyNick, int MyPort, InetAddress MyIp)
 	{
@@ -135,16 +130,21 @@ public class ParentsManager {
 				}
 				catch(NumberFormatException ex)
 				{
+					ex.printStackTrace();
 					//il file non è formattato correttamente
 					return false;
 				} 
 				catch (UnknownHostException e) {
+					e.printStackTrace();
 					return false;
 				}
 				
-				if (this.connect(nodoInfo[0], Integer.parseInt(nodoInfo[1]), address ,  MyNick, MyPort, MyIp))
+				int port = Integer.parseInt(nodoInfo[1]);
+				
+				if (this.connect(nodoInfo[0], port, address ,  MyNick, MyPort, MyIp))
 				{
-					connectionsManager.addClient(parentClientManager.getNick(),parentClientManager);
+					tableManager.insertNode(new UserInformations(nodoInfo[0], port, address));
+					connectionsManager.addClient(parentClientManager.getNick(), parentClientManager);
 					return true;
 				}
 				
@@ -157,7 +157,7 @@ public class ParentsManager {
 	}
 	
 	/**
-	 * If something goes wrong, we try to connect again, using the same informations.
+	 * Connection to the backup node
 	 */
 	public void riconnetti()
 	{
@@ -179,7 +179,6 @@ public class ParentsManager {
 	 */
 	static private List<String> readTable()
 	{
-		
 		LinkedList<String> informations = new LinkedList<String>();
 		
 		BufferedReader br;

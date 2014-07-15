@@ -12,4 +12,5 @@ public interface ClientInterface {
 	public int getPort();
 	public InetAddress getIP();
 	public Boolean sendMessage(String message);
+	public void stop();
 }

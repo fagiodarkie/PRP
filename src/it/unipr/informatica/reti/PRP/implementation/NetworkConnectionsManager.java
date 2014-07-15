@@ -58,7 +58,7 @@ public class NetworkConnectionsManager {
 		
 	}
 	
-	public boolean sendMesage(String nick, String Message)
+	public boolean sendMessage(String nick, String Message)
 	{
 		if(!hashtableNickClient.containsKey(nick))
 			return false;
@@ -67,6 +67,14 @@ public class NetworkConnectionsManager {
 			((ClientInterface)(hashtableNickClient.get(nick))).sendMessage(Message);
 			return true;
 		}
+	}
+
+	public void stopListening() {
+		List<ClientInterface> values = (List<ClientInterface>) hashtableNickClient.values();
+		for (ClientInterface client : values) {
+			client.stop();
+		}
+		
 	}
 
 }

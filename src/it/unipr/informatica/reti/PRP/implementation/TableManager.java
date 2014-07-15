@@ -1,8 +1,11 @@
 package it.unipr.informatica.reti.PRP.implementation;
 
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+
 import it.unipr.informatica.reti.PRP.interfaces.NetworkTableInterface;
+import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
 
 public class TableManager implements NetworkTableInterface {
 
@@ -40,11 +43,7 @@ public class TableManager implements NetworkTableInterface {
 		public String getInterface() {
 			return exitInterface;
 		}
-		
-		public boolean isNearMe() {
-			return reachable.equals(exitInterface);
-		}
-		
+				
 		public void resetInterface(String newInterface) {
 			exitInterface = newInterface;
 		}
@@ -54,6 +53,7 @@ public class TableManager implements NetworkTableInterface {
 	 * actual map, that is looked up to get informations about the network.
 	 */
 	private List<Couple> howToReach;
+	private Hashtable<String, UserInformationsInterface> informations;
 
 
 	public TableManager()
@@ -85,11 +85,24 @@ public class TableManager implements NetworkTableInterface {
 	 * @returns the UserInformationsInterface structure holding the informations
 	 * regarding the user. If the user is not connected, null is returned.
 	 */
-	public String getInfoByNick(String nick) {
-		for (int i = 0; i < howToReach.size(); ++i)
-			if (howToReach.get(i).getReachable().equals(nick))
-				return howToReach.get(i).getReachable();
+	public UserInformationsInterface getInfoByNick(String nick) {
+		if (informations.containsKey(nick))
+			return informations.get(nick);
 		return null;
+	}
+	
+	@Override
+	/**
+	 * Saves data for a new node.
+	 * 
+	 * @param newInformations the UserInformationsInterface structure holding the
+	 * relevant informations. If such informations were already store, they are
+	 * deleted and updated.
+	 */
+	public void insertNode(UserInformationsInterface newInformations) {
+		if (informations.containsKey(newInformations.getNick()))
+			informations.remove(newInformations.getNick());
+		informations.put(newInformations.getNick(), newInformations);
 	}
 
 	@Override
