@@ -95,7 +95,6 @@ public class ParentClientManager implements ClientInterface {
 				@Override
 				public void manageMessage(String[] PartsOfMessage) {
 					command.manageMessage(PartsOfMessage);
-					
 				}
 				
 				@Override
@@ -129,9 +128,6 @@ public class ParentClientManager implements ClientInterface {
 			
 			serverCommunicationManager.SendMessage(MessageFormatter.GenerateHelloMessage(MyNick, MyIP.getHostAddress(), MyPort));
 			
-			//TODO RIMUOVERE CODICE TEST
-			System.out.print("Messaggio inviato:");
-			System.out.println(MessageFormatter.GenerateHelloMessage(MyNick, MyIP.getHostAddress(), MyPort));
 			
 			//mi preparo per ricevere le informazioni dal padre riguardanti il suo nodo di backup
 			BufferedReader in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));

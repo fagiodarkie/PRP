@@ -4,10 +4,12 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+
 import it.unipr.informatica.reti.PRP.implementation.NetworkConnectionsManager;
 import it.unipr.informatica.reti.PRP.implementation.ParentsManager;
 import it.unipr.informatica.reti.PRP.implementation.ServerComponent;
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
+import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
 import it.unipr.informatica.reti.PRP.interfaces.UserInterfaceCommandManager;
@@ -69,7 +71,9 @@ public class PRPClient {
 					case "NICKS LIST":
 						String MessageToUserInterface = "";
 						//per ogni nodo a me conosciuto inserisco il nickname nem messaggio
-						for(String nick : tableManager.getConnectedNodes())
+						List<String> l = tableManager.getConnectedNodes();
+						System.out.println("list size:" + l.size());
+						for(String nick : l)
 							MessageToUserInterface.concat(nick + "\n");
 						//mando il messaggio all'interfaccia grafica
 						userInterface.PrintMessage(MessageToUserInterface);
@@ -109,6 +113,8 @@ public class PRPClient {
 		//controllo se l'utente ha scelto di connettersi manualmente
 		if( userInterface.getConnessioneManuale())
 		{
+
+			
 			if(!parentsManager.connect(userInterface.getNickManuale(), 
 								   userInterface.getPortManuale(), 
 								   userInterface.getIPManuale(), 
@@ -137,17 +143,17 @@ public class PRPClient {
 	public static void SaveTable()
 	{
 
-		List<String> listaNick = tableManager.getConnectedNodes();
+		List<String> listaNick = tableManager.allMyNeighbors();
 		
 		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(Constants.PathOfTableBackupFile+"//"+Constants.NameOfTableBackupFile, true)))) {
 			for(String nick : listaNick)
 			{
 				
-				UserInformationsInterface nodeInfo = tableManager.getInfoByNick(nick);
+				ClientInterface client = connections.getClient(nick);
 				
-				out.println(nodeInfo.getNick() + Constants.FileBackupInformationDivisor + 
-							nodeInfo.getPort()+ Constants.FileBackupInformationDivisor + 
-							nodeInfo.getAddress().toString() );
+				out.println(client.getNick() + Constants.FileBackupInformationDivisor + 
+							client.getPort()+ Constants.FileBackupInformationDivisor + 
+							client.getIP().toString() );
 			}
 		}catch (IOException e) {
 		    //exception handling left as an exercise for the reader

@@ -49,8 +49,6 @@ public class NetworkConnectionsManager {
 	public ClientInterface getClient (String nick)
 	{
 
-		//TODO REMOVE TEST
-		System.out.println(nick);
 		if(!hashtableNickClient.containsKey(nick))
 			return null;
 		

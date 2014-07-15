@@ -59,8 +59,9 @@ public class ServerComponent implements ServerInterface {
 		}
 		System.out.println("connessione alla porta avvenuta con successo");
 
-		while(accept){
+		while(true){
 			try {
+				
 				ClientManager c = new ClientManager(serverSocket.accept(), new Command() {
 
 					@Override
@@ -84,26 +85,25 @@ public class ServerComponent implements ServerInterface {
 
 				});
 				
-				//TODO REMOVE TEST
-				System.out.println("test --> connessione alla porta accettata correttamente");
-				System.out.println("nick da aggiungere: "+ c.getNick());
+				
+				
+				
 				tableManager.notifyIsReachedBy(c.getNick(), c.getNick());
-				tableManager.insertNode(new UserInformations(c.getNick(), c.getPort(), c.getIP()));
 				connections.addClient(c.getNick(), c);
-
+				c.sendMessage(MessageFormatter.GenerateTableMessage(this.tableManager));
+				
+				
+				
 				//ottengo tutti i nodi raggiungibili da me
 				List<String> nodi = tableManager.allMyNeighbors();
-
+				//tolgo il nodo che si è connesso
+				nodi.remove(c.getNick());
 				//genero il messaggio per aggiornare tutti gli altri
 				String isReachableMessage = MessageFormatter.GenerateReachableMessage(c.getNick());
 				if(nodi.size() > 0)
 					for ( String nodo : nodi)
 					{
-						if(nodo != null)
-						if( connections.getClient(nodo).getNick() != c.getNick())
-						{
 							connections.getClient(nodo).sendMessage(isReachableMessage);
-						}
 					}
 				/*FINE GESTIONE NEW CLIENT*/	
 			} catch (IOException e) {
@@ -170,8 +170,7 @@ public class ServerComponent implements ServerInterface {
 				Messaggio += m + " ";
 			}
 			
-			//TODO remove test code
-			commandClientCommunicationManagerInterface.SendMessage("il messaggio e': "+Messaggio);
+			
 			boolean broadcast = false;
 			for(String c : Commands)
 			{
@@ -185,16 +184,14 @@ public class ServerComponent implements ServerInterface {
 			if(broadcast)
 			{
 				sendBroadcast(Messaggio);
-				//TODO remove test code.
-				commandClientCommunicationManagerInterface.SendMessage("messaggio broadcast");
+			
 			}
 			else
 			{
 				for(String nick : Commands)
 				{
 					sendPointToPoint(Messaggio, nick);
-					//TODO remove test code
-					commandClientCommunicationManagerInterface.SendMessage("messaggio diretto a:" + nick);
+					
 				}
 			}
 				
@@ -247,9 +244,10 @@ public class ServerComponent implements ServerInterface {
 	 */
 	private void sendPointToPoint(String Message, String sendToNick)
 	{
+	
 		//lo devo mandare sulla linea corretta
 		String newMessage = MessageFormatter.GeneratePointToPointMessage(nick, sendToNick, Message);
-		connections.sendMessage(sendToNick, newMessage);
+		connections.sendMessage(tableManager.howToReach(sendToNick), newMessage);
 	}
 	
 	//FINE SEZIONE INVIO MESSAGGI
@@ -317,20 +315,20 @@ public class ServerComponent implements ServerInterface {
 			case Constants.MessageReachableCode :
 				String isReachableMessage = MessageFormatter.GenerateReachableMessage(messageManagement.getData());
 				sendBroadcast(isReachableMessage, Client);
-				tableManager.notifyIsReachedBy(messageManagement.getData(), Client);
-				
+				tableManager.notifyIsReachedBy(messageManagement.getSender(), Client);
+				break;
 			/*messaggio NOT REACHABLE */
-				case Constants.MessageNotReachableCode :
-					if(tableManager.isItConnected(messageManagement.getData()))
-					{
-						tableManager.hasDisconnected(messageManagement.getData());
-						String isNotReachableMessage = MessageFormatter.GenerateNotReachableMessage(messageManagement.getData());
-						sendBroadcast(isNotReachableMessage);
-					}
-					else
-					{
-						//DO NOTHING 
-					} 
+			case Constants.MessageNotReachableCode :
+				if(tableManager.isItConnected(messageManagement.getSender()))
+				{
+					tableManager.hasDisconnected(messageManagement.getSender());
+					String isNotReachableMessage = MessageFormatter.GenerateNotReachableMessage(messageManagement.getData());
+					sendBroadcast(isNotReachableMessage);
+				}
+				else
+				{
+					//DO NOTHING 
+				} 
 
 				break;
 				
@@ -343,15 +341,11 @@ public class ServerComponent implements ServerInterface {
 					//divido le varie informazioni
 					String Rows[] = table.split(":");
 					
-					//le informazioni devono essere per forza un multiplo di 3
-					if(Rows.length % 3 != 0)
-						throw new Exception("errore messaggio tabella (i dati riguardanti la tabella non sono multipli di 3)");
-					
 					//per ogni terna d'informazioni aggiorno la tabella
 					for(int i = 0 ; i < Rows.length ; i += 3 )
 					{
 						tableManager.notifyIsReachedBy(Client, Rows[i]);
-						tableManager.insertNode(new UserInformations(Rows[i], Integer.parseInt(Rows[i + 1]), InetAddress.getByName(Rows[i + 2])));
+						
 					}
 					
 					//genero il messaggio riguardante la mia tabella

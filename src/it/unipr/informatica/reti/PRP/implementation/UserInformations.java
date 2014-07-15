@@ -1,8 +1,9 @@
 package it.unipr.informatica.reti.PRP.implementation;
 
+import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
+
 import java.net.InetAddress;
 
-import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
 
 public class UserInformations implements UserInformationsInterface {
 
@@ -101,5 +102,6 @@ public class UserInformations implements UserInformationsInterface {
 			&& (port == i.getPort())
 			&& address.equals(i.getAddress());
 	}
+
 
 }

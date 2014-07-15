@@ -24,24 +24,17 @@ public class ClientManager implements ClientInterface {
 	 */
 	public ClientManager(Socket socket,final Command comandoGestioneMessaggi) throws Exception
 	{
-		//TODO REMOVE TEST
-		System.out.println("tentativo di connessione in corso");
+		
 		clientCommunicationManager = new ClientCommunicationManager(socket,new Command() {
 			
 			@Override
 			public void manageMessage(String[] PartsOfMessage)  {
-				//TODO remove
-				StringBuilder b = new StringBuilder();
-				for(String s : PartsOfMessage)
-					b.append(s);
-				System.out.println(b.toString());
+				
 				
 				//OTTENGO IL NICK
 				clientNick = PartsOfMessage[1];
 			 
-				//TODO REMOVE TEST
-				System.out.println("New connection with node:");
-				System.out.println("nick: "+ clientNick);
+				
 			 
 				//ESTRAPOLO LE ALTRE INFORMAZIONI
 				String ConnectionInfo[] = PartsOfMessage[2].split(Constants.ConnectionInfoDivisor);
@@ -49,8 +42,7 @@ public class ClientManager implements ClientInterface {
 					 //OTTENGO L'IP
 					clientIP = InetAddress.getByName(ConnectionInfo[0]);
 	
-					 //TODO REMOVE TEST
-					 System.out.println("IP: "+ clientIP);
+					
 					 
 				} catch (UnknownHostException e) {
 					// TODO gestione ip non valido
@@ -59,8 +51,7 @@ public class ClientManager implements ClientInterface {
 				//OTTENGO LA PORTA
 				clientPort = Integer.parseInt(ConnectionInfo[1].replace('\n', ' ').trim());
 				
-				//TODO REMOVE TEST
-				System.out.println("port: "+ clientPort);
+				
 				 
 				//dopo aver estratto le informazioni per creare il client segnalo più in alto che si è un connesso
 				//un nuovo client

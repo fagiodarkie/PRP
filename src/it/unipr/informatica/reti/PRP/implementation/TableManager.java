@@ -1,13 +1,11 @@
 package it.unipr.informatica.reti.PRP.implementation;
+import it.unipr.informatica.reti.PRP.interfaces.NetworkTableInterface;
 
-import java.util.Hashtable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import it.unipr.informatica.reti.PRP.interfaces.NetworkTableInterface;
-import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
-
-public class TableManager implements NetworkTableInterface {
+public class TableManager implements NetworkTableInterface{
 
 	/**
 	 * Class for table management.
@@ -43,7 +41,11 @@ public class TableManager implements NetworkTableInterface {
 		public String getInterface() {
 			return exitInterface;
 		}
-				
+		
+		public boolean isNearMe() {
+			return reachable.equalsIgnoreCase(exitInterface);
+		}
+		
 		public void resetInterface(String newInterface) {
 			exitInterface = newInterface;
 		}
@@ -53,12 +55,10 @@ public class TableManager implements NetworkTableInterface {
 	 * actual map, that is looked up to get informations about the network.
 	 */
 	private List<Couple> howToReach;
-	private Hashtable<String, UserInformationsInterface> informations;
-
-
-	public TableManager()
-	{
-		howToReach = new LinkedList<TableManager.Couple>();
+	
+	
+	public TableManager() {
+		howToReach = new ArrayList<Couple>();
 	}
 	
 	@Override
@@ -79,34 +79,6 @@ public class TableManager implements NetworkTableInterface {
 
 	@Override
 	/**
-	 * Provides the informations about the user whose nickname is specified.  
-	 * 
-	 * @param nick the nickname of the user whose informations are required
-	 * @returns the UserInformationsInterface structure holding the informations
-	 * regarding the user. If the user is not connected, null is returned.
-	 */
-	public UserInformationsInterface getInfoByNick(String nick) {
-		if (informations.containsKey(nick))
-			return informations.get(nick);
-		return null;
-	}
-	
-	@Override
-	/**
-	 * Saves data for a new node.
-	 * 
-	 * @param newInformations the UserInformationsInterface structure holding the
-	 * relevant informations. If such informations were already store, they are
-	 * deleted and updated.
-	 */
-	public void insertNode(UserInformationsInterface newInformations) {
-		if (informations.containsKey(newInformations.getNick()))
-			informations.remove(newInformations.getNick());
-		informations.put(newInformations.getNick(), newInformations);
-	}
-
-	@Override
-	/**
 	 * Provides informations about how to reach a given user, given its name.
 	 * 
 	 * @param nick the nickname of the user which should be reached.
@@ -123,11 +95,16 @@ public class TableManager implements NetworkTableInterface {
 
 	@Override
 	/**
-	 * This method MUST be called when the equivalent message is received.
+	 * This method MUST be called when the equivalent message is received,
+	 * that is, whenever a topology change occurs and a user can be reached through
+	 * another interface, different from the old one. This method is also called
+	 * whenever a new user connects to the network.
 	 * It updates the table adjusting the necessary informations.
 	 * 
-	 * @param reached the nickname of the user which can be reached by a new interface.
-	 * @param newInterface the nickname of the user by which the node may be reached.
+	 * @param reached the UserInformationsInterface structure holding the informations regarding
+	 * the nick which can be reached by a new interface.
+	 * @param newInterface the UserInformationsInterface structure holding the informations
+	 * regarding the new interface by which the node may be reached.
 	 */
 	public void notifyIsReachedBy(String reached,
 			String newInterface) {
@@ -193,6 +170,11 @@ public class TableManager implements NetworkTableInterface {
 	}
 
 	@Override
+	/**
+	 * Provides a list of connected nodes.
+	 * 
+	 * @returns a list of the nicknames of nodes connected to the network.
+	 */
 	public List<String> getConnectedNodes() {
 		List<String> result = new LinkedList<String>();
 		for (int i = 0; i < howToReach.size(); ++i) {

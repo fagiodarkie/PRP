@@ -24,6 +24,8 @@ public class ClientCommunicationManager implements ClientCommunicationManagerInt
 	 */
 	public ClientCommunicationManager(Socket socket,Command comandoGestioneMessaggi,boolean isDad) throws Exception
 	{
+
+		
 		//creo il worker da passare al thread per la gestione della ocmunicazione
 	    clientWorker = new ClientWorker(
 	    								new BufferedReader(new 
@@ -106,12 +108,10 @@ class ClientWorker implements Runnable {
 		if(!isDad)
 		{
 			message = in.readLine();
-			//TODO REMOVE CODICE TEST
-			System.out.println("Messaggio ricevuto: " + message);
+			
 			String partsOfMessage[] = message.split(Constants.MessagePartsDivisor);
 			
-			//TODO REMOVE CODE TEST
-			System.out.println(partsOfMessage[0]);
+			
 			if(partsOfMessage[0].equals(Constants.MessageHelloCode))
 			{
 				comando.manageMessage(partsOfMessage);
@@ -123,13 +123,14 @@ class ClientWorker implements Runnable {
 	
 	public void run(){
 		
-	
+		
 	  try {
 		message = in.readLine();
 		
 			while(message != null){
 			    try{
-
+			    	
+					
 					command.manageMessage(message,"");
 			        message = in.readLine();
 			      

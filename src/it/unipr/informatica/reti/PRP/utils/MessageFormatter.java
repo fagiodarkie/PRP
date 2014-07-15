@@ -51,26 +51,15 @@ public class MessageFormatter {
 		if(nodiConosciuti.size() > 1)
 			for(i = 0 ;i < (nodiConosciuti.size() - 1); ++i)
 			{
-
-				UserInformationsInterface info = tableManager.getInfoByNick(nodiConosciuti.get(i));
-				Message += info.getNick();
-				Message += ":";
-				Message += info.getAddress();
-				Message += ":";
-				Message += info.getPort();
+				
+				
+				Message += nodiConosciuti.get(i);
 				Message += ":";
 			}
 		//per l'ultimo (o per il primo se ce ne fosse solo uno) aggiungo le informazioni ma non aggiungo il ':' finale
 		
 
-		
-		UserInformationsInterface info = tableManager.getInfoByNick(nodiConosciuti.get(i));
-		 
-		Message += info.getNick();
-		Message += ":";
-		Message += info.getAddress();
-		Message += ":";
-		Message += info.getPort();
+		Message += nodiConosciuti.get(i);
 		return Message;
 	}
 	

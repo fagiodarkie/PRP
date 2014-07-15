@@ -93,10 +93,11 @@ public class ParentsManager {
 		//avviso che il genitore è raggiungibile tramite me
 		
 		command.manageMessage(MessageFormatter.GenerateReachableMessage(parentClientManager.getNick()), parentClientManager.MyNick);
-		tableManager.notifyIsReachedBy(parentClientManager.getNick(), parentClientManager.getNick());
-		connectionsManager.addClient(parentClientManager.getNick(),parentClientManager);
-		//TODO REMOVE TEST
-		System.out.print("test--> connessione al padre avvenuta con successo");
+		
+		tableManager.notifyIsReachedBy(Nick, Nick);
+		connectionsManager.addClient(Nick,parentClientManager);
+
+
 		return true;
 	}
 	
@@ -143,7 +144,7 @@ public class ParentsManager {
 				
 				if (this.connect(nodoInfo[0], port, address ,  MyNick, MyPort, MyIp))
 				{
-					tableManager.insertNode(new UserInformations(nodoInfo[0], port, address));
+					tableManager.notifyIsReachedBy(parentClientManager.getNick(), parentClientManager.getNick());
 					connectionsManager.addClient(parentClientManager.getNick(), parentClientManager);
 					return true;
 				}
