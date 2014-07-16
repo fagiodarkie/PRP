@@ -170,7 +170,8 @@ public class ServerComponent implements ServerInterface {
 	 */
 	public void ManageMessageFromUserInterface(String Message,String MyNick)
 	{
-
+		//TODO REMOVE TEST CODE
+		System.out.println("messaggio da analizzare: " + Message);
 
 		if(Message.contains("@") && Message.trim().startsWith("@"))
 		{

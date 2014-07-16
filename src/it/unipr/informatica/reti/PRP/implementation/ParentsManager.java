@@ -166,7 +166,7 @@ public class ParentsManager {
 	{
 		//mi salvo le informazioni riguardanti il nodo di backup
 		int port = parentClientManager.getBackupPort();
-		String nick = parentClientManager.getNick();
+		String nick = parentClientManager.getBackupNick();
 		InetAddress IP = parentClientManager.getBackupIP();
 		String Myport = parentClientManager.getMyPort();
 		String Mynick = parentClientManager.getMyNick();
