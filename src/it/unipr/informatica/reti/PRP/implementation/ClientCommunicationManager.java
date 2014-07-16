@@ -80,23 +80,7 @@ class ClientWorker implements Runnable {
 	Command command;
 	String message;
 	ClientCommunicationManager clientMan;
-	//Constructor
-	ClientWorker(Socket client,Command comando, ClientCommunicationManager clientManager) {
-	  this.client = client;
-	  command = comando;
-	  this.clientMan = clientManager;
-	  try{
-		    in = new BufferedReader(new 
-		      InputStreamReader(client.getInputStream()));
-		    out = new 
-		      PrintWriter(client.getOutputStream(), true); 
-		    
-		    //TODO IMPLEMENTARE GESTIONE ARRIVO HELLO NON ANCORA FATTO ma questo costruttore non lo usiamo...
-		  } catch (IOException e) {
-		   comando.manageDisconnection("");
-		   e.printStackTrace();
-		  }
-	  }
+	
 	
 	public ClientWorker(BufferedReader input,PrintWriter output,Command comando,ClientCommunicationManager clientManager, boolean isDad) throws Exception {
 		in = input;
@@ -111,8 +95,6 @@ class ClientWorker implements Runnable {
 			
 			String partsOfMessage[] = message.split(Constants.MessagePartsDivisor);
 			
-			//TODO remove test
-			System.out.println("messaggio di hello arrivato: " + message);
 			
 			if(partsOfMessage[0].equals(Constants.MessageHelloCode))
 			{
@@ -131,9 +113,7 @@ class ClientWorker implements Runnable {
 		
 			while(message != null){
 			    try{
-			    	//TODO remove test
-			    	System.out.println("il messaggio ricevuto e': " + message );
-					
+			    	
 					command.manageMessage(message,"");
 			        message = in.readLine();
 			      

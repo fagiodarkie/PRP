@@ -157,7 +157,6 @@ public class POJOMessage implements MessageInterface {
 	 */
 	@Override
 	public Timestamp getTimestamp() {
-		// TODO optional feature
 		return null;
 	}
 	

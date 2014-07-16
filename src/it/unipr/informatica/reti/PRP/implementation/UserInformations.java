@@ -57,14 +57,7 @@ public class UserInformations implements UserInformationsInterface {
 		address = identity.getAddress();
 	}
 
-	/**
-	 * Constructor from a marshalled UserInformation.
-	 * 
-	 * @param newInterface the marshalled informations.
-	 */
-	public UserInformations(String newInterface) {
-		// TODO string constructor!
-	}
+	
 
 
 	/**

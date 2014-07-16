@@ -58,8 +58,6 @@ public class NetworkConnectionsManager {
 	
 	public boolean sendMessage(String nick, String Message)
 	{
-		//TODO REMOVE TEST
-		System.out.println("a sendMessage sono stati passati i parametri: " + nick + ", " + Message);
 		if(!hashtableNickClient.containsKey(nick))
 			return false;
 		else

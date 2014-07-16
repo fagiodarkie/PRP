@@ -106,10 +106,7 @@ public class ServerComponent implements ServerInterface {
 
 				String TableMessage = MessageFormatter.GenerateTableMessage(Constants.tableManager, c.getNick());
 
-				//TODO REMOVE TEST
-				System.out.println("nick del client: " + c.getNick());
-				System.out.println("Messaggio tabella " + TableMessage);
-
+				
 
 				//se il messaggio ottenuto non è vuoto allora lo mando al client
 				if(TableMessage != null && !TableMessage.isEmpty())
@@ -123,9 +120,6 @@ public class ServerComponent implements ServerInterface {
 				neighbors.remove(c.getNick().trim());
 
 				String reachableMessage = MessageFormatter.GenerateReachableMessage(c.getNick());
-
-				//TODO REMOVE TEST
-				System.out.println("il messaggio da inviare ai vicini: "+ reachableMessage);
 
 				//invio a tutti i vicini il messaggio di reachable
 				for(String neighbor : neighbors)
@@ -168,9 +162,7 @@ public class ServerComponent implements ServerInterface {
 	 */
 	public void ManageMessageFromUserInterface(String Message,String MyNick)
 	{
-		//TODO REMOVE TEST CODE
-		System.out.println("messaggio da analizzare: " + Message);
-
+		
 		if(Message.contains("@") && Message.trim().startsWith("@"))
 		{
 
@@ -275,8 +267,6 @@ public class ServerComponent implements ServerInterface {
 	public void ManageMessage(String Message,String Client)
 	{
 
-		//TODO REMOVE TEST
-		System.out.println("messaggio ricevuto: " + Message + "\n ricevuto da: " + Client);
 		POJOMessage messageManagement;
 		try {
 			messageManagement = new POJOMessage(Message);
@@ -425,7 +415,6 @@ public class ServerComponent implements ServerInterface {
 
 			}
 		} catch (Exception e) {
-			// TODO gestire errore messaggio non valido
 			e.printStackTrace();
 		}
 
@@ -451,25 +440,7 @@ public class ServerComponent implements ServerInterface {
 		//invio a tutti i miei vicini (tranne quello che si è disconnesso) il messaggio di NotReachable
 		sendToAllMyNeighbors(notReachableMessage, nick);
 		
-		/*
-		//ottengo tutti i nodi che erano raggiungibili dal nodo che è scomparso
-		List<String> reachableNodes = Constants.tableManager.getAllNodesReachableFrom(nick);
-		//TODO REMOVE TEST
-		System.out.println("list of reachable nodes size:"+reachableNodes.size());
-		
-		//per ogni nodo che era raggiungibile
-		for(String node : reachableNodes)
-		{
-			//creo il messaggio che avverte che era raggiungibile
-			notReachableMessage = MessageFormatter.GenerateNotReachableMessage(node);
-			
-			//lo invio a tutti i miei vicini (ovviamente il vicino che si era staccato è già stato cancellato
-			sendToAllMyNeighbors(notReachableMessage, "");
-			
-			//tolgo anche il collegamento dalla tabella
-			Constants.tableManager.hasDisconnected(node);
-		}*/
-		
+
 		//invio all'interfaccia utente il comando di stampare il messaggio che l'utente si è disconnesso
 		commandClientCommunicationManagerInterface.SendMessage(nick+" is disconnected");
 

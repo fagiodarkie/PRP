@@ -90,10 +90,6 @@ public class ParentsManager {
 		{
 			return false;
 		}
-		//avviso che il genitore è raggiungibile tramite me
-		
-		//TODO CONTROLLARE QUESTA PARTE!!!
-		//command.manageMessage(MessageFormatter.GenerateReachableMessage(parentClientManager.getNick()), parentClientManager.MyNick);
 		
 		Constants.tableManager.notifyIsReachedBy(Nick, Nick);
 		Constants.connections.addClient(Nick,parentClientManager);
@@ -172,7 +168,6 @@ public class ParentsManager {
 		InetAddress MyIP = parentClientManager.getMyIP();
 		//riconnetto il padre
 		if(!this.connect(nick, port, IP,  Mynick,Integer.parseInt(Myport), MyIP))
-			//TODO METTERE A POSTO MESSAGGIO NON POSSIAMO RICONNETTERCI
 			{
 			System.out.println("impossibile riconnettermi al padre quindi diventiamo root");
 			this.commandToNotifyDadChange.manageMessage(null);

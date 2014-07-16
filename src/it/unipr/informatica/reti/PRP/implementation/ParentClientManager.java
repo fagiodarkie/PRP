@@ -112,7 +112,6 @@ public class ParentClientManager implements ClientInterface {
 						}
 						else command.manageMessage(Message, serverNick);
 					} catch (Exception e) {
-						// TODO gestire errore messaggio non valido
 						e.printStackTrace();
 					}
 					

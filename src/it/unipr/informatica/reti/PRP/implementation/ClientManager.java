@@ -45,7 +45,6 @@ public class ClientManager implements ClientInterface {
 					
 					 
 				} catch (UnknownHostException e) {
-					// TODO gestione ip non valido
 					e.printStackTrace();
 				}
 				//OTTENGO LA PORTA
