@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class ParentsManager {
 	
 	ParentClientManager parentClientManager;
 	Command command;
-	
+	Command commandToNotifyDadChange;
 	/**
 	 * Constructor. This manager is different from the ClientManager as the socket used differ a little.
 	 * This object manages the communication with the node to which the client first connected (from
@@ -28,9 +29,10 @@ public class ParentsManager {
 	 * @param tableManager the table manager to which notifications should be given.
 	 * @param command 
 	 */
-	public ParentsManager(Command command)
+	public ParentsManager(Command command, Command commandToNotifyDadChange)
 	{
 		this.command= command;
+		this.commandToNotifyDadChange = commandToNotifyDadChange;
 	}
 	
 	/**
@@ -46,6 +48,9 @@ public class ParentsManager {
 	 */
 	public Boolean connect(String Nick, int Port, InetAddress IP, String MyNick, int MyPort, InetAddress MyIp)
 	{
+		if(Nick == null || IP == null || Port == -1)
+			return false;
+		
 		try
 		{
 			parentClientManager = new ParentClientManager(Nick, Port, IP, MyNick, Integer.toString(MyPort ), MyIp, new Command() {
@@ -160,16 +165,27 @@ public class ParentsManager {
 	public void riconnetti()
 	{
 		//mi salvo le informazioni riguardanti il nodo di backup
-		int port = parentClientManager.backupPort;
-		String nick = parentClientManager.backupNick;
-		InetAddress IP = parentClientManager.backupIP;
-		String Myport = parentClientManager.MyPort;
-		String Mynick = parentClientManager.MyNick;
-		InetAddress MyIP = parentClientManager.MyIP;
+		int port = parentClientManager.getBackupPort();
+		String nick = parentClientManager.getNick();
+		InetAddress IP = parentClientManager.getBackupIP();
+		String Myport = parentClientManager.getMyPort();
+		String Mynick = parentClientManager.getMyNick();
+		InetAddress MyIP = parentClientManager.getMyIP();
 		//riconnetto il padre
 		if(!this.connect(nick, port, IP,  Mynick,Integer.parseInt(Myport), MyIP))
 			//TODO METTERE A POSTO MESSAGGIO NON POSSIAMO RICONNETTERCI
-			System.out.println("impossibile riconnettermi ad un padre quindi diventiamo root");
+			{
+			System.out.println("impossibile riconnettermi al padre quindi diventiamo root");
+			this.commandToNotifyDadChange.manageMessage(null);
+			}
+		else
+		{//devo aggiornare i miei figli sul nuovo nodo di backup
+			ArrayList<String> arrInfo = new ArrayList<>();
+			arrInfo.add(nick);
+			arrInfo.add(IP.toString().replace("\\","//").replace("/", ""));
+			arrInfo.add(String.valueOf(port));
+			this.commandToNotifyDadChange.manageMessage(arrInfo.toArray(new String[arrInfo.size()]));
+		}
 	}
 	
 	/**

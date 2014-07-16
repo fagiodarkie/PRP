@@ -1,6 +1,8 @@
 package it.unipr.informatica.reti.PRP.implementation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,6 +72,17 @@ public class TableManager2 implements NetworkTableInterface{
 			 neighbors.add(nick);
 		
 		return neighbors;
+	}
+	
+	public List<String> getAllNodesReachableFrom(String nick)
+	{
+		List<String> nodes = new LinkedList<>();
+
+		for(String node : howToReach.keySet())
+			if(howToReach.get(node).trim().equals(nick.trim()))
+				nodes.add(node);
+		return nodes;
+		
 	}
 
 }

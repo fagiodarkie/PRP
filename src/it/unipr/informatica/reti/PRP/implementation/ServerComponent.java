@@ -1,4 +1,4 @@
-	package it.unipr.informatica.reti.PRP.implementation;
+package it.unipr.informatica.reti.PRP.implementation;
 
 import java.io.*;
 import java.net.*;
@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.sun.corba.se.impl.orbutil.closure.Constant;
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.interfaces.ClientCommunicationManagerInterface;
@@ -20,6 +23,10 @@ public class ServerComponent implements ServerInterface {
 	private ServerSocket serverSocket;
 	private ClientCommunicationManagerInterface commandClientCommunicationManagerInterface;
 	private String nick;
+	private Boolean hasDad;
+	private String dadNick;
+	private String dadIP;
+	private String dadPort;
 	//END STATO INTERNO
 
 	//START CONSTRUCTOR
@@ -35,6 +42,7 @@ public class ServerComponent implements ServerInterface {
 	{
 		this.commandClientCommunicationManagerInterface = command;
 		this.nick = nick;
+		this.hasDad = false;
 	}
 	//END CONSTRUCTOR
 
@@ -47,7 +55,7 @@ public class ServerComponent implements ServerInterface {
 	 */
 	@Override
 	public void start()  {
-		
+
 		try{
 			serverSocket = new ServerSocket(Constants.PortOfServer);
 		} catch (IOException e) {
@@ -58,7 +66,7 @@ public class ServerComponent implements ServerInterface {
 
 		while(true){
 			try {
-				
+
 				ClientManager c = new ClientManager(serverSocket.accept(), new Command() {
 
 					@Override
@@ -75,55 +83,62 @@ public class ServerComponent implements ServerInterface {
 					}
 					@Override
 					public void manageDisconnection(String nick) {
-						
+
 						//gestisco la disconnessione del client
 						ManageDisconnection(nick);
 					}
 
 				});
-				
-				
-				
-				
+
+
+
+
 				Constants.tableManager.notifyIsReachedBy(c.getNick(), c.getNick());
 				Constants.connections.addClient(c.getNick(), c);
+
 				
+				//se ho un nodo padre invio al nodo il nodo di backup( mio padre )
+				if(hasDad)
+				{
+					String backupNickMessage = MessageFormatter.GenerateBackupMessage(dadNick,dadIP, dadPort);
+					c.sendMessage(backupNickMessage);
+				}
 				//ora che ho aggiornato la mia tabella devo inviare al nuovo nodo la mia tabella in modo che sappia chi può raggiungere
 				//se la tabella contiene soltantoil nuovo nodo non invio niente altrimente invio tutti tranne il nuovo nodo 
-				
+
 				String TableMessage = MessageFormatter.GenerateTableMessage(Constants.tableManager, c.getNick());
-				
+
 				//TODO REMOVE TEST
 				System.out.println("nick del client: " + c.getNick());
 				System.out.println("Messaggio tabella " + TableMessage);
-				
-				
+
+
 				//se il messaggio ottenuto non è vuoto allora lo mando al client
 				if(TableMessage != null && !TableMessage.isEmpty())
 					c.sendMessage(TableMessage);
-				
+
 				//AGGIORNO I MIEI VICINI CHE E' ARRIVATO UN NUOVO NODO
-				
+
 				//estraggo i vicini a cui inviarlo
 				List<String> neighbors = Constants.tableManager.allMyNeighbors();
 				//tolgo il nodo dal quale ho ricevuto il messaggio
 				neighbors.remove(c.getNick().trim());
-				
+
 				String reachableMessage = MessageFormatter.GenerateReachableMessage(c.getNick());
-				
+
 				//TODO REMOVE TEST
 				System.out.println("il messaggio da inviare ai vicini: "+ reachableMessage);
-				
+
 				//invio a tutti i vicini il messaggio di reachable
 				for(String neighbor : neighbors)
 				{
 					Constants.connections.sendMessage(neighbor, reachableMessage);
 				}
-				
-				
+
+
 				/*FINE GESTIONE NEW CLIENT*/	
 			} catch (IOException e) {
-				
+
 				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -135,7 +150,7 @@ public class ServerComponent implements ServerInterface {
 
 
 	}
-	
+
 	/**
 	 * Commands the server to stop listening to the outside.
 	 */
@@ -153,39 +168,39 @@ public class ServerComponent implements ServerInterface {
 	 * @param POJOMessage the message to be processed.
 	 * @param MyNick nickname to which the message should be sent, if any (?)
 	 */
-	public void ManageMessageFromUserInterface(String Message)
+	public void ManageMessageFromUserInterface(String Message,String MyNick)
 	{
-		
+
 
 		if(Message.contains("@") && Message.trim().startsWith("@"))
 		{
-			
+
 			String partsOfMessage[]= Message.trim().split(" ");
 			LinkedList<String> Commands = new LinkedList<String>();
 			LinkedList<String> Messages = new LinkedList<String>();
 			boolean endCommand = false;
 			for(String part : partsOfMessage)
-				{
-					String temp = part.trim();
-					if(temp.startsWith("@") && !temp.equals("@") && !endCommand)
-					{	//è un comando e quindi lo inserisco nella lista dei comandi
-						Commands.add(part.replace("@", ""));
-					}
-					else
-					{
-						Messages.add(part);
-						endCommand = true;
-					}
+			{
+				String temp = part.trim();
+				if(temp.startsWith("@") && !temp.equals("@") && !endCommand)
+				{	//è un comando e quindi lo inserisco nella lista dei comandi
+					Commands.add(part.replace("@", ""));
 				}
-		
+				else
+				{
+					Messages.add(part);
+					endCommand = true;
+				}
+			}
+
 			//ricreo il messaggio da inviare
-			String Messaggio = "";
+			String MessaggeToSend = "";
 			for(String m : Messages)
 			{
-				Messaggio += m + " ";
+				MessaggeToSend += m + " ";
 			}
-			
-			
+
+
 			boolean broadcast = false;
 			for(String c : Commands)
 			{
@@ -195,23 +210,27 @@ public class ServerComponent implements ServerInterface {
 					break;
 				}
 			}
-			
+
 			if(broadcast)
 			{
-				
-				//TODO implementare send broadcast del messaggio ricevuto da riga di comando
-			
+
+				//Genero il messaggio broadcast
+				String MessageBroadcast = MessageFormatter.GenerateBroadcastMessage(MyNick, MessaggeToSend);
+				//invio il messaggio
+				sendToAllMyNeighbors(MessageBroadcast, "");
+
 			}
 			else
 			{
 				for(String nick : Commands)
 				{
-					//TODO implementare  il send to point to point con messaggio ricevuto da riga di comando
-					//sendPointToPoint(Messaggio, nick);
-					
+					//genero il messaggio da mandare
+					String MessagePointToPoint = MessageFormatter.GeneratePointToPointMessage(MyNick, nick, MessaggeToSend); 
+					//lo mando all'interfaccia corretta
+					Constants.connections.sendMessage(Constants.tableManager.howToReach(nick), MessagePointToPoint);
 				}
 			}
-				
+
 		}
 		else
 		{
@@ -219,41 +238,31 @@ public class ServerComponent implements ServerInterface {
 		}
 	}
 
-	
-	
-	
+
+
+
 	//INIZIO SEZIONE INVIO MESSAGGI
-	/**
-	 * permette di inviare un messaggio a tutti i nodi vicini
-	 * @param POJOMessage messaggio da inviare
-	 */
-	private void sendBroadcast(String Message)
-	{
-		for(String nick : Constants.tableManager.allMyNeighbors())
-		{
-			String newMessage = MessageFormatter.GenerateBroadcastMessage(nick, Message);
-			Constants.connections.getClient(nick).sendMessage(newMessage);
-		}
-	}
+	
 
 	/**
 	 * permette d'inviare un messaggio a tutti  i nodi vicini tranne a nickNoNA
 	 * @param POJOMessage messagio da inviare
 	 * @param nickNoNA nick a cui non inviarlo
 	 */
-	private void sendBroadcast(String Message, String nickNoNA)
+	private void sendToAllMyNeighbors(String Message, String nickNoNA)
 	{
+		//estraggo i vicini a cui inviarlo
+		List<String> neighbors = Constants.tableManager.allMyNeighbors();
+		//tolgo il nodo dal quale ho ricevuto il messaggio
+		neighbors.remove(nickNoNA.trim());
 
-		for(String sendToNick : Constants.tableManager.allMyNeighbors())
+		//aggiorno i miei vicini mandando lo stesso messaggio
+		for(String neighbor : neighbors)
 		{
-			if(sendToNick != nickNoNA)
-			{
-				String newMessage = MessageFormatter.GeneratePointToPointMessage(nick, sendToNick, Message);
-				Constants.connections.getClient(sendToNick).sendMessage(newMessage);
-			}
+			Constants.connections.sendMessage(neighbor, Message);
 		}
 	}
-	
+
 	/**
 	 * invia un messaggio ad un utente
 	 * @param POJOMessage messaggio da inviare
@@ -261,14 +270,14 @@ public class ServerComponent implements ServerInterface {
 	 */
 	private void sendPointToPoint(String Message, String sendToNick)
 	{
-	
+
 		//lo devo mandare sulla linea corretta
 		String newMessage = MessageFormatter.GeneratePointToPointMessage(nick, sendToNick, Message);
 		Constants.connections.sendMessage(Constants.tableManager.howToReach(sendToNick), newMessage);
 	}
-	
+
 	//FINE SEZIONE INVIO MESSAGGI
-	
+
 	/**
 	 * Manages the receiving of messages sent from the other client, parent included.
 	 *
@@ -277,187 +286,156 @@ public class ServerComponent implements ServerInterface {
 	 */
 	public void ManageMessage(String Message,String Client)
 	{
-		
+
 		//TODO REMOVE TEST
 		System.out.println("messaggio ricevuto: " + Message + "\n ricevuto da: " + Client);
 		POJOMessage messageManagement;
 		try {
 			messageManagement = new POJOMessage(Message);
-		
 
 
 
-		//STEP 2 controllo che genere di messaggio e' e lo gestisco
-		switch(messageManagement.getCode())
-		{
-		
-		
-		/*messaggio HELLO       */	
+
+			//STEP 2 controllo che genere di messaggio e' e lo gestisco
+			switch(messageManagement.getCode())
+			{
+
+
+			/*messaggio HELLO       */	
 			case Constants.MessageHelloCode :
 				//DO NOTHING
-			break;
-			
-			
-			
-		/*messaggio POINT TO POINT*/
+				break;
+
+
+
+				/*messaggio POINT TO POINT*/
 			case Constants.MessagePointToPointCode:
-				
+
 			{
 				String receiver = messageManagement.getReceiver();
-				
+
 				if(!Constants.tableManager.isItConnected(receiver))
 				{
-					
-				}
-				else
-				{}
-			}
-				
-				
-				//TODO fare point to point
-				/*
-				if(!Constants.tableManager.isItConnected(messageManagement.getReceiver()))
-				{
+
 					//il messaggio è rivolto a me e quindi lo invio all'interfaccia grafica
-					this.commandClientCommunicationManagerInterface.SendMessage(Client + ":" + messageManagement.getData());
+					this.commandClientCommunicationManagerInterface.SendMessage(messageManagement.getSender() + ":" + messageManagement.getData());
 				}
 				else
 				{
-					Constants.connections.sendMessage(Constants.tableManager.howToReach(messageManagement.getReceiver()), Message);
-				}*/
+					String interfaceToSend = Constants.tableManager.howToReach(receiver);
+
+					if(interfaceToSend!= null && !interfaceToSend.isEmpty())
+						Constants.connections.sendMessage(interfaceToSend, Message);
+				}
+			}
+
+
 			break;
 
-			
-			
-		/*messaggio BROADCAST     */
+
+
+			/*messaggio BROADCAST     */
 			case Constants.MessageBroadcastCode :
+
+				//invio all'interfaccia grafica il messaggio
+				this.commandClientCommunicationManagerInterface.SendMessage(messageManagement.getSender() + ":" + messageManagement.getData());
 				
-				//TODO fare broadcast
+				//invio il messaggio a tutti i miei vicini tranne quello che me l'ha inviato
+				sendToAllMyNeighbors(Message, Client);
 				
-				/*sendBroadcast(Message, Client);
-				List<String> list = Constants.tableManager.allMyNeighbors();
-				list.remove(Client);
-				for(String nick : list)
-				{
-					Constants.connections.sendMessage(nick, Message);
-				}*/
-				
-			break;
-			
-			
-			
-			/*messaggio BACKUP NICK   */
+				break;
+
+
+
+				/*messaggio BACKUP NICK   */
 			case Constants.MessageBackupNickCode:
 				//DO NOTHING: ONLY PARENT CAN SEND BACKUP NICK
-			break;
-			
-			
-			
-			/*messaggio REACHABLE     */
+				break;
+
+
+
+				/*messaggio REACHABLE     */
 			case Constants.MessageReachableCode :
 			{
 				//Aggiorno la mia tabella
 				Constants.tableManager.notifyIsReachedBy(messageManagement.getData(), Client);
-				
-				//estraggo i vicini a cui inviarlo
-				List<String> neighbors = Constants.tableManager.allMyNeighbors();
-				//tolgo il nodo dal quale ho ricevuto il messaggio
-				neighbors.remove(Client.trim());
-				
-				//aggiorno i miei vicini mandando lo stesso messaggio
-				for(String neighbor : neighbors)
-				{
-					Constants.connections.sendMessage(neighbor, Message);
-				}
-				
+
+
+				sendToAllMyNeighbors(Message, Client);
+
 
 				commandClientCommunicationManagerInterface.SendMessage(messageManagement.getData()+" is connected");
 			}
-				break;
-			
-				/*messaggio NOT REACHABLE */
+			break;
+
+			/*messaggio NOT REACHABLE */
 			case Constants.MessageNotReachableCode :
 			{
 				String nick = messageManagement.getData();
 				//se è un mio vicino allora lo rimuovo anche dalle connessioni
 				if(Constants.tableManager.isNearMe(nick))
 					Constants.connections.removeClient(nick);
-				
+
 				//Aggiorno la mia tabella togliendo il nick
 				Constants.tableManager.hasDisconnected(nick);
-				
-				//estraggo i vicini a cui inviarlo
-				List<String> neighbors = Constants.tableManager.allMyNeighbors();
-				//tolgo il nodo dal quale ho ricevuto il messaggio
-				neighbors.remove(Client.trim());
-				
-				//aggiorno i miei vicini mandando lo stesso messaggio
-				for(String neighbor : neighbors)
-				{
-					Constants.connections.sendMessage(neighbor, Message);
-				}
+
+				sendToAllMyNeighbors(Message, Client);
+
 				commandClientCommunicationManagerInterface.SendMessage(nick+" is disconnected");
 				
-			}
-				break;
 				
+
+			}
+			break;
+
 			/*messaggio TABLE   */      
-				case Constants.MessageTableCode:
+			case Constants.MessageTableCode:
+			{
+
+				//ottengo le informazioni della tabella
+				String tabella = messageManagement.getData();
+
+				String reachableMessage="";
+
+				//controllo se sono multiple
+				if(tabella.contains(":"))
 				{
-					
-					//ottengo le informazioni della tabella
-					String tabella = messageManagement.getData();
-					
-					//estraggo i vicini a cui inviarlo
-					List<String> neighbors = Constants.tableManager.allMyNeighbors();
-					//tolgo il nodo dal quale ho ricevuto il messaggio
-					neighbors.remove(Client.trim());
-					String reachableMessage="";
-					
-					//controllo se sono multiple
-					if(tabella.contains(":"))
+					List<String> nicks = new ArrayList<String>(Arrays.asList(tabella.split(":")));
+					nicks.remove(nick);
+					for(String newNick : nicks)
 					{
-						List<String> nicks = new ArrayList<String>(Arrays.asList(tabella.split(":")));
-						for(String newNick : nicks)
-						{
-							if(newNick != null && !newNick.trim().isEmpty())
-							{
-								//aggiungo il nuovo nick alla tabella
-								Constants.tableManager.notifyIsReachedBy(newNick, Client);
-								
-								//creo il messaggio di aggiornamento
-								reachableMessage = MessageFormatter.GenerateReachableMessage(newNick);
-								
-								for(String neighbor : neighbors)
-								{
-									Constants.connections.sendMessage(neighbor, reachableMessage);
-								}
-								
-							}
-						}
-					}
-					else
-					{
-						if(tabella != null && !tabella.trim().isEmpty())
+						if(newNick != null && !newNick.trim().isEmpty() )
 						{
 							//aggiungo il nuovo nick alla tabella
-							Constants.tableManager.notifyIsReachedBy(tabella, Client);
-							
-							//AGGIORNO I MIEI VICINI
-							
+							Constants.tableManager.notifyIsReachedBy(newNick, Client);
+
 							//creo il messaggio di aggiornamento
-							reachableMessage = MessageFormatter.GenerateReachableMessage(tabella);
-							
-							for(String neighbor : neighbors)
-							{
-								Constants.connections.sendMessage(neighbor, reachableMessage);
-							}
+							reachableMessage = MessageFormatter.GenerateReachableMessage(newNick);
+
+							sendToAllMyNeighbors(reachableMessage, Client);
 						}
 					}
-				}	
-					break;
+				}
+				else
+				{
+					if(tabella != null && !tabella.trim().isEmpty())
+					{
+						//aggiungo il nuovo nick alla tabella
+						Constants.tableManager.notifyIsReachedBy(tabella, Client);
 
-		}
+						//AGGIORNO I MIEI VICINI
+
+						//creo il messaggio di aggiornamento
+						reachableMessage = MessageFormatter.GenerateReachableMessage(tabella);
+
+						sendToAllMyNeighbors(reachableMessage, Client);
+
+					}
+				}
+			}	
+			break;
+
+			}
 		} catch (Exception e) {
 			// TODO gestire errore messaggio non valido
 			e.printStackTrace();
@@ -470,29 +448,58 @@ public class ServerComponent implements ServerInterface {
 	 * 
 	 * @param nick the client who is about to be disconnected.
 	 */
-	 public void ManageDisconnection(String nick)
+	public void ManageDisconnection(String nick)
 	{
-		 if(Constants.tableManager.isNearMe(nick)){
-				//tolgo l'interfaccia con il client
-			 Constants.connections.removeClient(nick);
-			}
-			//aggiorno la tabella delle interfacce
-		 Constants.tableManager.hasDisconnected(nick);
-		 
-		
-		//estraggo i vicini a cui inviarlo
-		List<String> neighbors = Constants.tableManager.allMyNeighbors();
-		//tolgo il nodo dal quale ho ricevuto il messaggio
-		neighbors.remove(nick.trim());
+		if(Constants.tableManager.isNearMe(nick)){
+			//tolgo l'interfaccia con il client
+			Constants.connections.removeClient(nick);
+		}
+		//aggiorno la tabella delle interfacce
+		Constants.tableManager.hasDisconnected(nick);
+
+
 		String notReachableMessage = MessageFormatter.GenerateNotReachableMessage(nick);
-		//aggiorno i miei vicini mandando lo stesso messaggio
-		for(String neighbor : neighbors)
+
+		//invio a tutti i miei vicini (tranne quello che si è disconnesso) il messaggio di NotReachable
+		sendToAllMyNeighbors(notReachableMessage, nick);
+		
+		/*
+		//ottengo tutti i nodi che erano raggiungibili dal nodo che è scomparso
+		List<String> reachableNodes = Constants.tableManager.getAllNodesReachableFrom(nick);
+		//TODO REMOVE TEST
+		System.out.println("list of reachable nodes size:"+reachableNodes.size());
+		
+		//per ogni nodo che era raggiungibile
+		for(String node : reachableNodes)
 		{
-			Constants.connections.sendMessage(neighbor, notReachableMessage);
+			//creo il messaggio che avverte che era raggiungibile
+			notReachableMessage = MessageFormatter.GenerateNotReachableMessage(node);
 			
+			//lo invio a tutti i miei vicini (ovviamente il vicino che si era staccato è già stato cancellato
+			sendToAllMyNeighbors(notReachableMessage, "");
+			
+			//tolgo anche il collegamento dalla tabella
+			Constants.tableManager.hasDisconnected(node);
+		}*/
+		
 		//invio all'interfaccia utente il comando di stampare il messaggio che l'utente si è disconnesso
 		commandClientCommunicationManagerInterface.SendMessage(nick+" is disconnected");
-		}
+
+	}
+	
+	public void setHasDad()
+	{
+		this.hasDad = false;
+		this.dadIP = "";
+		this.dadNick = "";
+		this.dadPort = "";
+	}
+	public void setHasDad(String dadNick, String dadIp, String dadPort)
+	{
+		this.hasDad = true;
+		this.dadIP = dadIp;
+		this.dadNick = dadNick;
+		this.dadPort = dadPort;
 	}
 }
 //END SERVER CLASS

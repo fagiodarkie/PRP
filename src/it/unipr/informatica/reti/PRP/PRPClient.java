@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 
 import it.unipr.informatica.reti.PRP.implementation.NetworkConnectionsManager;
+import it.unipr.informatica.reti.PRP.implementation.ParentClientManager;
 import it.unipr.informatica.reti.PRP.implementation.ParentsManager;
 import it.unipr.informatica.reti.PRP.implementation.ServerComponent;
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
@@ -78,7 +79,7 @@ public class PRPClient {
 						break;
 						
 					default:
-						serverComponent.ManageMessageFromUserInterface(Message);
+						serverComponent.ManageMessageFromUserInterface(Message,userInterface.getNick());
 						
 					
 					}
@@ -106,7 +107,31 @@ public class PRPClient {
 				//giro il messaggio al  server
 				serverComponent.ManageDisconnection(Name);
 			}
+		},
+		new Command() {
+			
+			@Override
+			public void manageMessage(String[] PartsOfMessage) {
+				if(PartsOfMessage != null)
+					serverComponent.setHasDad(PartsOfMessage[0], PartsOfMessage[1], PartsOfMessage[2]);
+				else
+					serverComponent.setHasDad();
+			}
+			
+			@Override
+			public void manageMessage(String Message, String Client) {
+				// DO NOTHING
+				
+			}
+			
+			@Override
+			public void manageDisconnection(String Name) {
+				// DO NOTHING
+				
+			}
 		});
+		
+		
 		
 		//controllo se l'utente ha scelto di connettersi manualmente
 		if( userInterface.getConnessioneManuale())
@@ -120,17 +145,34 @@ public class PRPClient {
 								   Constants.PortOfServer, 
 								   InetAddress.getByName("127.0.0.1") 
 								   ))
+			{
 				userInterface.PrintMessage("impossibile connettersi al server richiesto: il presente nodo sta per diventare un server principale");
+				serverComponent.setHasDad();
+			}
+			else
+			{
+				ParentClientManager parent = parentsManager.getParent();
+				serverComponent.setHasDad(parent.getNick(), parent.getIP().toString().replace("\\", "").replace("/", ""),String.valueOf(parent.getPort()));
+						
+			}
 		}
 		else
-			//comando al gestore di cercare un nodo lilbero tra quelli salvati precedentemente al quale connettermi
+			//comando al gestore di cercare un nodo libero tra quelli salvati precedentemente al quale connettermi
 			if(!parentsManager.connect(Constants.PathOfTableBackupFile + "//" + Constants.NameOfTableBackupFile, //path del file di backup della tabella
 									Nick, //mio nick con cui autenticarmi
 									Constants.PortOfServer, //porta a cui far autenticare il server 
 									InetAddress.getByName("127.0.0.1") //mio ip
 									))
+			{
 				userInterface.PrintMessage("nessun server a cui connettersi: il presente nodo sta per diventare un server principale");
-	
+				serverComponent.setHasDad();
+			}
+			else
+			{
+				ParentClientManager parent = parentsManager.getParent();
+				serverComponent.setHasDad(parent.getNick(), parent.getIP().toString().replace("\\", "").replace("/", ""),String.valueOf(parent.getPort()));
+						
+			}
 		//faccio partire l'interfaccia grafica
 		userInterface.StartReadingFromInput();
 		

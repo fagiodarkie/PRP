@@ -28,9 +28,12 @@ public class MessageFormatter {
 		return Constants.MessageBroadcastCode + Constants.MessagePartsDivisor + Nick + Constants.MessagePartsDivisor + Message;
 	}
 	
-	public static String GenerateBackupMessage(String Nick)
+	public static String GenerateBackupMessage(String Nick, String IP, String Port)
 	{
-		return Constants.MessageBackupNickCode + Constants.MessagePartsDivisor + Nick;
+		return Constants.MessageBackupNickCode + Constants.MessagePartsDivisor 
+				+ Nick + Constants.MessagePartsDivisor
+				+ IP + Constants.MessagePartsDivisor
+				+Port;
 	}
 	
 	public static String GenerateReachableMessage(String Nick)

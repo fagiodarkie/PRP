@@ -46,7 +46,6 @@ public class ParentClientManager implements ClientInterface {
 		try {
 			backupIP = InetAddress.getByName(ipAndPort[0]);
 		} catch (UnknownHostException e) {
-			// ora come ora, se va male il peggio che può succedere è che non sappiamo a chi connetterci: amen.
 			e.printStackTrace();
 		}
 		backupPort = Integer.parseInt(ipAndPort[1]);
@@ -74,6 +73,10 @@ public class ParentClientManager implements ClientInterface {
 		this.MyIP = MyIP;
 		this.MyNick = MyNick;
 		this.MyPort = MyPort;
+		
+		this.backupIP = null;
+		this.backupNick = null;
+		this.backupPort = -1;
 	}
 	
 	/**
@@ -155,6 +158,35 @@ public class ParentClientManager implements ClientInterface {
 	public int getPort() {
 		return serverPort;
 	}
+	
+
+	
+	public InetAddress getBackupIP() {
+		return backupIP;
+	}
+	
+	public String getBackupNick() {
+		return backupNick;
+	}
+	
+	public int getBackupPort() {
+		return backupPort;
+	}
+	
+	
+	public InetAddress getMyIP() {
+		return MyIP;
+	}
+	
+	public String getMyNick() {
+		return MyNick;
+	}
+	
+	public String getMyPort() {
+		return MyPort;
+	}
+	
+	
 	@Override
 	public Boolean sendMessage(String Message) {
 		return serverCommunicationManager.SendMessage(Message);
