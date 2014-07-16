@@ -302,6 +302,18 @@ public class ServerComponent implements ServerInterface {
 		/*messaggio POINT TO POINT*/
 			case Constants.MessagePointToPointCode:
 				
+			{
+				String receiver = messageManagement.getReceiver();
+				
+				if(!Constants.tableManager.isItConnected(receiver))
+				{
+					
+				}
+				else
+				{}
+			}
+				
+				
 				//TODO fare point to point
 				/*
 				if(!Constants.tableManager.isItConnected(messageManagement.getReceiver()))
@@ -358,55 +370,35 @@ public class ServerComponent implements ServerInterface {
 					Constants.connections.sendMessage(neighbor, Message);
 				}
 				
-				//TODO fare reachable
-				/*
-				System.out.println("aggiungo alla lista: " + messageManagement.getSender()+"\n reggiungibile da: " + Client);
-				Constants.tableManager.notifyIsReachedBy(messageManagement.getSender(), Client);
-				String isReachableMessage = MessageFormatter.GenerateReachableMessage(messageManagement.getSender());
-				//ottengo tutti i nodi a me vicini
-				List<String> myNeighbors = Constants.tableManager.allMyNeighbors();
-				
-				//estraggo dalla lista il nodo che mi ha inviato la sua tabella
-				myNeighbors.remove(Client);
-				
-				for(String nick : myNeighbors)
-				{
-					//invio la tabella agli altri nodi vicini
-					if(nick != null)
-						Constants.connections.sendMessage(isReachableMessage, Client);
-				}*/
+
+				commandClientCommunicationManagerInterface.SendMessage(messageManagement.getData()+" is connected");
 			}
 				break;
 			
 				/*messaggio NOT REACHABLE */
 			case Constants.MessageNotReachableCode :
+			{
+				String nick = messageManagement.getData();
+				//se è un mio vicino allora lo rimuovo anche dalle connessioni
+				if(Constants.tableManager.isNearMe(nick))
+					Constants.connections.removeClient(nick);
 				
+				//Aggiorno la mia tabella togliendo il nick
+				Constants.tableManager.hasDisconnected(nick);
 				
-				//TODO fare not reachable
+				//estraggo i vicini a cui inviarlo
+				List<String> neighbors = Constants.tableManager.allMyNeighbors();
+				//tolgo il nodo dal quale ho ricevuto il messaggio
+				neighbors.remove(Client.trim());
 				
-				/*
-				if(Constants.tableManager.isItConnected(messageManagement.getSender()))
+				//aggiorno i miei vicini mandando lo stesso messaggio
+				for(String neighbor : neighbors)
 				{
-					Constants.tableManager.hasDisconnected(messageManagement.getSender());
-					String isNotReachableMessage = MessageFormatter.GenerateNotReachableMessage(messageManagement.getSender());
-					//ottengo tutti i nodi a me vicini
-					List<String> neighbors = Constants.tableManager.allMyNeighbors();
-					
-					//estraggo dalla lista il nodo che mi ha inviato la sua tabella
-					neighbors.remove(Client);
-					
-					for(String nick : neighbors)
-					{
-						//invio la tabella agli altri nodi vicini
-						if(nick != null)
-							Constants.connections.sendMessage(isNotReachableMessage, Client);
-					}
+					Constants.connections.sendMessage(neighbor, Message);
 				}
-				else
-				{
-					//DO NOTHING 
-				} */
-
+				commandClientCommunicationManagerInterface.SendMessage(nick+" is disconnected");
+				
+			}
 				break;
 				
 			/*messaggio TABLE   */      
@@ -487,8 +479,20 @@ public class ServerComponent implements ServerInterface {
 			//aggiorno la tabella delle interfacce
 		 Constants.tableManager.hasDisconnected(nick);
 		 
-			//invio all'interfaccia utente il comando di stampare il messaggio che l'utente si è disconnesso
-			commandClientCommunicationManagerInterface.SendMessage(nick+" is disconnected");
+		
+		//estraggo i vicini a cui inviarlo
+		List<String> neighbors = Constants.tableManager.allMyNeighbors();
+		//tolgo il nodo dal quale ho ricevuto il messaggio
+		neighbors.remove(nick.trim());
+		String notReachableMessage = MessageFormatter.GenerateNotReachableMessage(nick);
+		//aggiorno i miei vicini mandando lo stesso messaggio
+		for(String neighbor : neighbors)
+		{
+			Constants.connections.sendMessage(neighbor, notReachableMessage);
+			
+		//invio all'interfaccia utente il comando di stampare il messaggio che l'utente si è disconnesso
+		commandClientCommunicationManagerInterface.SendMessage(nick+" is disconnected");
+		}
 	}
 }
 //END SERVER CLASS
