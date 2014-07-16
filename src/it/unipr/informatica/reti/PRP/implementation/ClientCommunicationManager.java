@@ -111,6 +111,8 @@ class ClientWorker implements Runnable {
 			
 			String partsOfMessage[] = message.split(Constants.MessagePartsDivisor);
 			
+			//TODO remove test
+			System.out.println("messaggio di hello arrivato: " + message);
 			
 			if(partsOfMessage[0].equals(Constants.MessageHelloCode))
 			{
@@ -129,7 +131,8 @@ class ClientWorker implements Runnable {
 		
 			while(message != null){
 			    try{
-			    	
+			    	//TODO remove test
+			    	System.out.println("il messaggio ricevuto e': " + message );
 					
 					command.manageMessage(message,"");
 			        message = in.readLine();

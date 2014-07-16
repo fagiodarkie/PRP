@@ -9,6 +9,7 @@ import it.unipr.informatica.reti.PRP.implementation.NetworkConnectionsManager;
 import it.unipr.informatica.reti.PRP.implementation.ParentsManager;
 import it.unipr.informatica.reti.PRP.implementation.ServerComponent;
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
+import it.unipr.informatica.reti.PRP.implementation.TableManager2;
 import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
@@ -19,14 +20,11 @@ import it.unipr.informatica.reti.PRP.utils.Constants;
 
 public class PRPClient {
 
-
-	static TableManager tableManager ;
-	static NetworkConnectionsManager connections ;
 	
 	public static void main(String args[]) throws UnknownHostException {
 
-		tableManager = new TableManager();
-		connections = new NetworkConnectionsManager();
+		Constants.tableManager = new TableManager2();
+		Constants.connections = new NetworkConnectionsManager();
 	
 		final String Nick;
 		//CREATE AND INITIALIZE USER INTERFACE
@@ -36,7 +34,7 @@ public class PRPClient {
 		Nick = userInterface.getNick();
 		
 		//CREATE SERVER LISTENER
-		final ServerComponent serverComponent = new ServerComponent(tableManager,connections, new ClientCommunicationManagerInterface() {
+		final ServerComponent serverComponent = new ServerComponent( new ClientCommunicationManagerInterface() {
 			
 			@Override
 			public Boolean SendMessage(String Message) {
@@ -71,10 +69,10 @@ public class PRPClient {
 					case "NICKS LIST":
 						String MessageToUserInterface = "";
 						//per ogni nodo a me conosciuto inserisco il nickname nem messaggio
-						List<String> l = tableManager.getConnectedNodes();
+						List<String> l = Constants.tableManager.getConnectedNodes();
 						System.out.println("list size:" + l.size());
 						for(String nick : l)
-							MessageToUserInterface.concat(nick + "\n");
+							MessageToUserInterface += nick + ",";
 						//mando il messaggio all'interfaccia grafica
 						userInterface.PrintMessage(MessageToUserInterface);
 						break;
@@ -90,7 +88,7 @@ public class PRPClient {
 		});
 		
 		//creo il componente che gestirà (e ricollegherà in caso d'errore) il padre
-		ParentsManager parentsManager = new ParentsManager(connections,tableManager,new Command() {
+		ParentsManager parentsManager = new ParentsManager(new Command() {
 			
 			@Override
 			public void manageMessage(String[] PartsOfMessage) {
@@ -143,13 +141,13 @@ public class PRPClient {
 	public static void SaveTable()
 	{
 
-		List<String> listaNick = tableManager.allMyNeighbors();
+		List<String> listaNick = Constants.tableManager.allMyNeighbors();
 		
 		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(Constants.PathOfTableBackupFile+"//"+Constants.NameOfTableBackupFile, true)))) {
 			for(String nick : listaNick)
 			{
 				
-				ClientInterface client = connections.getClient(nick);
+				ClientInterface client = Constants.connections.getClient(nick);
 				
 				out.println(client.getNick() + Constants.FileBackupInformationDivisor + 
 							client.getPort()+ Constants.FileBackupInformationDivisor + 

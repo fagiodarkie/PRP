@@ -17,8 +17,6 @@ import java.util.List;
 public class ParentsManager {
 	
 	ParentClientManager parentClientManager;
-	NetworkConnectionsManager connectionsManager;
-	TableManager tableManager;
 	Command command;
 	
 	/**
@@ -30,11 +28,9 @@ public class ParentsManager {
 	 * @param tableManager the table manager to which notifications should be given.
 	 * @param command 
 	 */
-	public ParentsManager(NetworkConnectionsManager connectionsManager,TableManager tableManager, Command command)
+	public ParentsManager(Command command)
 	{
-		this.connectionsManager = connectionsManager;
 		this.command= command;
-		this.tableManager = tableManager;
 	}
 	
 	/**
@@ -92,10 +88,11 @@ public class ParentsManager {
 		}
 		//avviso che il genitore è raggiungibile tramite me
 		
-		command.manageMessage(MessageFormatter.GenerateReachableMessage(parentClientManager.getNick()), parentClientManager.MyNick);
+		//TODO CONTROLLARE QUESTA PARTE!!!
+		//command.manageMessage(MessageFormatter.GenerateReachableMessage(parentClientManager.getNick()), parentClientManager.MyNick);
 		
-		tableManager.notifyIsReachedBy(Nick, Nick);
-		connectionsManager.addClient(Nick,parentClientManager);
+		Constants.tableManager.notifyIsReachedBy(Nick, Nick);
+		Constants.connections.addClient(Nick,parentClientManager);
 
 
 		return true;
@@ -144,8 +141,8 @@ public class ParentsManager {
 				
 				if (this.connect(nodoInfo[0], port, address ,  MyNick, MyPort, MyIp))
 				{
-					tableManager.notifyIsReachedBy(parentClientManager.getNick(), parentClientManager.getNick());
-					connectionsManager.addClient(parentClientManager.getNick(), parentClientManager);
+					Constants.tableManager.notifyIsReachedBy(parentClientManager.getNick(), parentClientManager.getNick());
+					Constants.connections.addClient(parentClientManager.getNick(), parentClientManager);
 					return true;
 				}
 				
@@ -170,7 +167,9 @@ public class ParentsManager {
 		String Mynick = parentClientManager.MyNick;
 		InetAddress MyIP = parentClientManager.MyIP;
 		//riconnetto il padre
-		this.connect(nick, port, IP,  Mynick,Integer.parseInt(Myport), MyIP);
+		if(!this.connect(nick, port, IP,  Mynick,Integer.parseInt(Myport), MyIP))
+			//TODO METTERE A POSTO MESSAGGIO NON POSSIAMO RICONNETTERCI
+			System.out.println("impossibile riconnettermi ad un padre quindi diventiamo root");
 	}
 	
 	/**

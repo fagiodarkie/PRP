@@ -85,8 +85,8 @@ public class POJOMessage implements MessageInterface {
 				if(partsOfMessaggio.length < 2)
 					throw new Exception("messaggio non valido");
 				else{
-					sender = partsOfMessaggio[1];
-					data = "";
+					data = partsOfMessaggio[1];
+					sender = "";
 					receiver = "";
 					
 				}
@@ -96,8 +96,8 @@ public class POJOMessage implements MessageInterface {
 				if(partsOfMessaggio.length < 2)
 					throw new Exception("messaggio non valido");
 				else{
-					sender = partsOfMessaggio[1];
-					data = "";
+					data = partsOfMessaggio[1];
+					sender = "";
 					receiver = "";
 					
 				}

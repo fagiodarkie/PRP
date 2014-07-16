@@ -109,7 +109,7 @@ public class ParentClientManager implements ClientInterface {
 						{
 							UpdateBackupInformation(pojoMessage);
 						}
-						else command.manageMessage(Message, Client);
+						else command.manageMessage(Message, serverNick);
 					} catch (Exception e) {
 						// TODO gestire errore messaggio non valido
 						e.printStackTrace();
@@ -119,7 +119,7 @@ public class ParentClientManager implements ClientInterface {
 				
 				@Override
 				public void manageDisconnection(String Name) {
-					command.manageDisconnection(Name);
+					command.manageDisconnection(serverNick);
 				}
 			},true);
 			

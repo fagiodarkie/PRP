@@ -1,6 +1,7 @@
 package it.unipr.informatica.reti.PRP.utils;
 
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
+import it.unipr.informatica.reti.PRP.implementation.TableManager2;
 import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
 
 import java.util.List;
@@ -42,10 +43,21 @@ public class MessageFormatter {
 		return Constants.MessageNotReachableCode + Constants.MessagePartsDivisor + Nick;
 	}
 	
-	public static String GenerateTableMessage(TableManager tableManager)
+	public static String GenerateTableMessage(TableManager2 tableManager, String nickNonA)
 	{
 		String Message = Constants.MessageTableCode+Constants.MessagePartsDivisor;
 		List<String> nodiConosciuti = tableManager.getConnectedNodes();
+		
+		//faccio pulizia nella lista
+		for(int n = nodiConosciuti.size()-1 ; n >= 0 ; --n)
+		{
+			if(nodiConosciuti.get(n) == "" || nodiConosciuti.get(n) == nickNonA.trim())
+				nodiConosciuti.remove(n);
+		}
+		
+		if (nodiConosciuti.size() == 0)
+			return null;
+		
 		int i = 0;
 		//se ho più di un nodo allora per quelli interni aggiungo alla fine anche un altro ':'
 		if(nodiConosciuti.size() > 1)
