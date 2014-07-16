@@ -1,7 +1,5 @@
 package it.unipr.informatica.reti.PRP.implementation;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -131,9 +129,6 @@ public class ParentClientManager implements ClientInterface {
 			
 			serverCommunicationManager.SendMessage(MessageFormatter.GenerateHelloMessage(MyNick, MyIP.getHostAddress(), MyPort));
 			
-			
-			//mi preparo per ricevere le informazioni dal padre riguardanti il suo nodo di backup
-			BufferedReader in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 			
 			
 			return true;

@@ -2,7 +2,6 @@ package it.unipr.informatica.reti.PRP.implementation;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.utils.Constants;
-import it.unipr.informatica.reti.PRP.utils.MessageFormatter;
 
 import java.io.BufferedReader;
 import java.io.File;

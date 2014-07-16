@@ -10,10 +10,8 @@ import it.unipr.informatica.reti.PRP.implementation.ParentClientManager;
 import it.unipr.informatica.reti.PRP.implementation.ParentsManager;
 import it.unipr.informatica.reti.PRP.implementation.ServerComponent;
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
-import it.unipr.informatica.reti.PRP.implementation.TableManager2;
 import it.unipr.informatica.reti.PRP.interfaces.ClientInterface;
 import it.unipr.informatica.reti.PRP.interfaces.Command;
-import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
 import it.unipr.informatica.reti.PRP.interfaces.UserInterfaceCommandManager;
 import it.unipr.informatica.reti.PRP.interfaces.ClientCommunicationManagerInterface;
 import it.unipr.informatica.reti.PRP.userInterface.UserInterface;
@@ -24,7 +22,7 @@ public class PRPClient {
 	
 	public static void main(String args[]) throws UnknownHostException {
 
-		Constants.tableManager = new TableManager2();
+		Constants.tableManager = new TableManager();
 		Constants.connections = new NetworkConnectionsManager();
 	
 		final String Nick;

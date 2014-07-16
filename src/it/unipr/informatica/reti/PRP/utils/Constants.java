@@ -2,7 +2,6 @@ package it.unipr.informatica.reti.PRP.utils;
 
 import it.unipr.informatica.reti.PRP.implementation.NetworkConnectionsManager;
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
-import it.unipr.informatica.reti.PRP.implementation.TableManager2;
 
 public class Constants {
 	
@@ -58,6 +57,6 @@ public class Constants {
 	public final static String PathOfTableBackupFile ="";
 	public final static String NameOfTableBackupFile ="table.txt";
 	public final static String FileBackupInformationDivisor=":-:";
-	public static TableManager2 tableManager;
+	public static TableManager tableManager;
 	public static NetworkConnectionsManager connections;
 }

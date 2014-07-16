@@ -1,8 +1,6 @@
 package it.unipr.informatica.reti.PRP.utils;
 
 import it.unipr.informatica.reti.PRP.implementation.TableManager;
-import it.unipr.informatica.reti.PRP.implementation.TableManager2;
-import it.unipr.informatica.reti.PRP.interfaces.UserInformationsInterface;
 
 import java.util.List;
 
@@ -46,7 +44,7 @@ public class MessageFormatter {
 		return Constants.MessageNotReachableCode + Constants.MessagePartsDivisor + Nick;
 	}
 	
-	public static String GenerateTableMessage(TableManager2 tableManager, String nickNonA)
+	public static String GenerateTableMessage(TableManager tableManager, String nickNonA)
 	{
 		String Message = Constants.MessageTableCode+Constants.MessagePartsDivisor;
 		List<String> nodiConosciuti = tableManager.getConnectedNodes();

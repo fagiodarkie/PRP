@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.sun.corba.se.impl.orbutil.closure.Constant;
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 import it.unipr.informatica.reti.PRP.interfaces.Command;
 import it.unipr.informatica.reti.PRP.interfaces.ClientCommunicationManagerInterface;
@@ -264,18 +262,7 @@ public class ServerComponent implements ServerInterface {
 		}
 	}
 
-	/**
-	 * invia un messaggio ad un utente
-	 * @param POJOMessage messaggio da inviare
-	 * @param Nick nickname dell'utente a cui inviarlo
-	 */
-	private void sendPointToPoint(String Message, String sendToNick)
-	{
-
-		//lo devo mandare sulla linea corretta
-		String newMessage = MessageFormatter.GeneratePointToPointMessage(nick, sendToNick, Message);
-		Constants.connections.sendMessage(Constants.tableManager.howToReach(sendToNick), newMessage);
-	}
+	
 
 	//FINE SEZIONE INVIO MESSAGGI
 
