@@ -1,0 +1,269 @@
+
+\documentclass[10pt]{article} % Misura del font 10pt
+\usepackage[italian]{babel} % Documento in italiano
+\usepackage{geometry} % Per cambiare la pagina in A4
+\usepackage[italian]{babel}
+\usepackage{xcolor}
+\usepackage[utf8]{inputenc}
+\geometry{a4paper} % Imposta la misura della pagina per essere un A4
+\linespread{1.2} % Interlinea moltiplicata per 1.2
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	TITOLO
+%----------------------------------------------------------------------------------------
+
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\center 
+
+\textsc{\LARGE Università degli Studi di Parma}\\[1.5cm]
+\textsc{\Large Dipartimento di Informatica}\\[0.5cm]
+\textsc{\large Reti di Calcolatori}\\[0.5cm]
+
+\HRule \\[0.4cm]
+{ \huge \bfseries Peer to Peer Routing Protocol: \\
+un protocollo di routing per reti P2P}\\[0.4cm]
+\HRule \\[1.5cm]
+
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Autori:}\\
+Alessio \textsc{Bortolotti} \\
+Jacopo \textsc{Freddi}
+\end{flushleft}
+\end{minipage}
+~
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Professore:} \\
+Roberto \textsc{Alfieri}
+\end{flushright}
+\end{minipage}\\[4cm]
+
+{\large \today}\\[3cm]
+\vfill
+
+\end{titlepage}
+
+%----------------------------------------------------------------------------------------
+%	INDICE
+%----------------------------------------------------------------------------------------
+
+\tableofcontents
+
+\newpage
+
+\begin{abstract}
+Scopo del progetto è l'elaborazione di un algoritmo che permetta ad un insieme di nodi di connettersi via {\tt TCP} e gestire la rete senza l'ausilio di un server. Date le grandi affinità con la struttura dei router, il protocollo elaborato è stato chiamato {\tt PRP}, ovvero Peer-to-Peer Routing Protocol.\\
+Date le complessità di implementazione, la soluzione proposta nel codice è necessariamente incompleta. Gli scopi di questa relazione sono:
+\begin{enumerate}
+	\item mostrare l'architettura di rete risultante dall'utilizzo dell'algoritmo e metterne in evidenza alcune proprietà;
+	\item illustrare il funzionamento dell'algoritmo;
+	\item discutere dei miglioramenti che possono essere apportati all'algoritmo.
+\end{enumerate}
+Notare che, anche se l'applicativo di esempio sopra modellato è una semplice chat, il protocollo può essere utilizzato anche per altri scopi, quali ad esempio:
+\begin{enumerate}
+	\item trasferimento di file;
+	\item mail service;
+	\item {\tt VoIP}.
+\end{enumerate}
+\end{abstract}
+
+\section{Requisiti}
+\`E dato un insieme di nodi, collegati tra loro tramite il protocollo {\tt TCP}. Ogni nodo simula un router: tiene aperte le connessioni verso gli altri nodi ed inoltra i pacchetti in arrivo verso il router interessato. \`E richiesto un protocollo che mantenga allineate le tabelle di inoltro dei nodi e risponda automaticamente agli errori ed ai cambiamenti di topologia della rete.
+
+\section{L'algoritmo}
+L'algoritmo progettato è semplice ma robusto. Per la procedura di prima connessione è richiesto specificare manualmente uno o più nodi a cui connettersi, per le connessioni successive può essere utile salvarsi in un file (o in un database) una lista contenente indirizzi e porte di nodi noti, in modo da rendere più efficace la procedura di connessione. Nel caso i nodi debbano simulare una rete di router sempre attivi, comunque, l'eventualità di doversi connettere nuovamente è molto remota e le problematiche relative ad eventuali cambiamenti di indirizzo/porta dei nodi e dell'identità di questi sono molto semplificate dato che reti del genere sono generalmente progettate per essere robuste, stabili e sempre attive.
+
+\subsection{Pseudocodice dell'algoritmo}
+{ \tt
+Seleziona un nickname ed una porta di ascolto disponibile; \\
+Seleziona un nodo all'interno della rete; \\
+Connettiti a quel nodo; \\
+Comunica a quel nodo le tue informazioni di ascolto ed il tuo nickname; \\
+Ricevi da quel nodo le informazioni relative ai nickname che possono essere\\ raggiunti attraverso di lui; \\
+Ricevi da quel nodo il nodo di backup; \\
+Inizia ad accettare connessioni dalla porta di ascolto;\\
+In parallelo:
+\begin{enumerate}
+	\item gestisci le connessioni in entrata;
+	\item gestisci i messaggi in entrata;
+	\item gestisci i cambiamenti di topologia;
+\end{enumerate}
+}
+Come è possibile notare, la struttura non è poi molto diversa da una normale chat. Le gestioni in parallelo sono descritte poco più avanti, ma per ora è necessario soffermarsi su un punto critico del protocollo: il nodo di backup.
+
+
+\subsection{L'importanza del nodo di backup}
+Perché la topologia di rete resista ad errori fatali (disconnessioni da internet, cali di corrente, ...) è necessario che i nodi adiacenti a quello danneggiato abbiano la possibilità di tornare a connettersi alla rete. Per qualsiasi nodo, il nodo di backup viene fornito dal padre ed indica un nodo a cui è possibile connettersi in caso il padre si disconnetta. Il padre può adottare qualsiasi metodo per distribuire i nodi di backup, ma è necessario che la distribuzione non abbia cicli. Il metodo utilizzato nel codice presentato è semplice: ci si limita ad indicare come nodo di backup il proprio padre. Una soluzione alternativa consiste nell'indicare al proprio primo figlio il proprio padre, al secondo figlio il primo figlio, e così via. Nessuna di queste soluzioni genera cicli nella topologia di rete.\\
+\`E possibile lavorare più finemente sotto quest'aspetto, dato che da esso dipendono molti parametri che determinano la capacità della rete di essere veloce ed adattativa. Una modifica, suggerita nelle possibili espansioni, prevede di bilanciare l'albero: una scelta che semplifica le operazioni di connessione dal punto di vista di chi si connette, ma le complica dal punto di vista di chi accetta le connessioni.
+
+\subsubsection{Bilanciare l'albero: il problema}
+Nel protocollo finora presentato, quando un nodo si connette deve decidere a quale nodo connettersi. Se il nodo scelto non è attivo, si può continuare a provare a connettersi ad altri nodi conosciuti (per entrare in una rete già costituita) o decidere di non connettersi a nessuno e dare la propria disponibilità a fungere da radice dell'albero.\\
+La scelta del nodo a cui connettersi rende impossibile ottenere alberi bilanciati. Questo degrada le prestazioni: un albero con troppe diramazioni e bassa profondità causa un sovraccarico di tempo di elaborazione e memoria (necessari per memorizzare ed utilizzare le tabelle di inoltro, più lunghe), mentre un albero con poche diramazioni ma molto profondo aumenta notevolmente il ritardo tra l'invio di un pacchetto da una foglia e l'arrivo di questo ad una foglia diversa. Occorre dunque un protocollo a parte per realizzare la gestione bilanciata dell'albero.
+\subsubsection{Bilanciare l'albero: la soluzione}
+La prima cosa da fare, se si desidera avere un albero bilanciato, è definire il numero di connessioni massimo accettato dal nodo. Questa può essere una scelta statica e comune per tutti i nodi o variabile e definita al momento di lanciare il client. Occorre inoltre modificare la procedura di accettazione delle connessioni: una volta raggiunto il numero massimo di nodi connessi, le successive richieste di connessione vengono rifiutate e reindirizzate verso la radice dell'albero. Il primo nodo, che deve conoscere la profondità di ciascuno dei sottoalberi, reindirizza quindi la richiesta sul sottoalbero meno profondo. Ogni nodo che riceve la comunicazione di richiesta di connessione dal proprio padre la accetta, se ha posto, oppure la indirizza verso il sottoalbero meno profondo. Questo protocollo consente di mantenere bilanciata la rete: se ogni nodo ha $m$ connessioni massime, in una rete di $n$ nodi il numero massimo di passaggi per passare un messaggio da una parte all'altra della rete è $2log_m(n)$, il che è un costo più che accettabile almeno per piccole o medie reti.
+\subsubsection{Bilanciare l'albero: il nodo di backup}
+Dove entra il nodo di backup in tutto questo? Come sempre, quando un nodo scompare. Alla disconnessione di un nodo, il suo primo figlio ne prende il posto come figlio del suo padre mentre gli altri nodi figli vengono `adottati' da quest'ultimo. Questa operazione è abbastanza poco costosa e permette di gestire i cambi di topologia mantenendo una struttura economica dal punto di vista dello scambio dei messaggi.
+
+\subsection{Gestione delle connessioni in ingresso}
+Di default le connessioni in arrivo vengono automaticamente accettate, ma l'algoritmo prevede di rifiutarle dopo aver ricevuto una sequenza di messaggi non validi. Come in ogni struttura di questo tipo, alla porta di ascolto comunicata alla rete è associata una socket in attesa di richieste di connessioni. Ad ogni connessione accettata vengono generati due nuovi thread, per questo è consigliabile valutare, in un'applicazione pratica, l'applicazione del protocollo di albero bilanciato sopra descritto.\\
+All'instaurarsi della connessione il nuovo nodo deve inviare al suo nodo padre le informazioni relative alla sua porta di ascolto, al proprio indirizzo IP ed al proprio nickname; \\
+Dopo aver accettato la connessione e verificato che il nodo connesso stia utilizzando il protocollo giusto, il nodo padre deve inviare al nuovo nodo due messaggi:
+\begin{enumerate}
+	\item Viene sempre inviato, anche se la rete è vuota, un messaggio contenente la tabella del nodo padre. Questa tabella serve come tabella iniziale per il nuovo nodo, ma sarà poi modificata in seguito agli eventuali cambiamenti di topologia;
+	\item Viene inviato un messaggio che specifica il nodo di backup per il nuovo nodo. Se il nuovo nodo è il primo nodo ad essere connesso al nodo padre ed il nodo padre è il primo nodo della rete, il nodo di backup coincide con il nuovo nodo.
+\end{enumerate}
+Contemporaneamente, il padre manda a tutte le altre interfacce della sua rete un messaggio informativo, contenente le informazioni sul nuovo nodo. Come nelle reti di router, ogni nodo che riceve questo messaggio salva nella sua tabella di inoltro che il nuovo nodo è raggiungibile tramite il nodo da cui il messaggio è arrivato. 
+
+\subsection{Gestione dei messaggi ricevuti}
+La gestione dei messaggi ricevuti è un'operazione fondamentale: ogni nodo è responsabile dei sottoalberi che lega a suo padre sia per quanto riguarda il mantenimento delle connessione che per la propagazione dei pacchetti di alto livello. \\
+Quella che segue è una rassegna dei tipi di messaggio, dichiarati nel modulo { \tt Constants}:
+\begin{itemize}
+	\item {\tt MessageHelloCode}: contiene le informazioni per contattare il nodo mittente. Viene sempre trattenuto ed è trasparente all'utente, in quanto serve unicamente al mantenimento della rete. Può però avere conseguenze nell'interfaccia grafica (ad esempio rendendo noto all'utente che il nodo è ora connesso).
+	\item {\tt MessagePointToPointCode}: contiene un messaggio con un singolo destinatario. Se il destinatario coincide con il client corrente il messaggio viene trattenuto, altrimenti viene inviato nuovamente verso il nodo che permette di raggiungere tale destinatario, se presente.
+	\item {\tt MessageBroadcastCode}: contiene un messaggio per tutta la rete. Sfruttando la peculiare disposizione della rete, è possibile gestire questo messaggio semplicemente redirigendolo verso tutti i nodi tranne quello da cui il messaggio proveniva originariamente.
+	\item {\tt MessageBackupNickCode}: contiene le informazioni sul nodo di backup per il mittente. Viene sempre trattenuto ed è trasparente all'utente, in quanto serve unicamente al mantenimento della rete.
+	\item {\tt MessageReachableCode}: segnala che un certo nodo è ora raggiungibile. Questo messaggio ha conseguenze prevalentemente logistiche e legate al mantenimento della rete e della tabella di inoltro, ma può essere utile reagire ad esso per aggiungere informazioni all'interfaccia grafica.
+	\item {\tt MessageNotReachableCode}: segnala che il nodo specificato non è più raggiungibile. Questo messaggio ha conseguenze prevalentemente logistiche e legate al mantenimento della rete e della tabella di inoltro, ma può essere utile reagire ad esso per aggiungere informazioni all'interfaccia grafica.
+	\item {\tt MessageTableCode}: segnala che il messaggio contiene la tabella del mittente, opportunamente codificata. Questo messaggio viene sempre trattenuto ed è trasparente all'utente.
+\end{itemize}
+
+\subsection{Gestione dei cambiamenti di topologia}
+Quest'attività è fondamentale nel mantenimento della connettività intranet. I messaggi rilevanti sono pochi, ma significativi:
+\subsubsection{{\tt MessageBackupNickCode}}
+	A seconda dell'architettura adottata, questo messaggio può essere scartato. Nell'architettura in esempio, in cui il nodo di backup è sempre il proprio padre, questo messaggio viene accettato solo se è il proprio padre ad inviarlo. Quando un client accetta questo messaggio, si salva le informazioni sul nodo di backup indicato. Queste informazioni sono relative unicamente al nodo dal quale questo messaggio proviene.
+\subsubsection{{\tt MessageReachableCode}}
+	A questo messaggio è quasi sempre associata una nuova connessione. Questo messaggio viene propagato in broadcast in modo che l'informazione diventi accessibile a tutti i nodi della rete. Il messaggio prevede di inviare solo le informazioni relative al nodo, in quanto il modo in cui raggiungerlo (l'interfaccia di uscita) è implicito nel mittente. In altre parole, se {\tt A} è connesso a {\tt B} e {\tt C} si connette a {\tt B}, {\tt C} invierà a {\tt B} un messaggio del tipo {\tt Hello C}, e {\tt B} da questo messaggio capirà che {\tt C} è raggiungibile. Quando {\tt B} invia ad {\tt A} il messaggio {\tt Reachable C}, {\tt A} scopre che {\tt C} è raggiungibile tramite {\tt B}. Inoltre, quando {\tt A} propagherà l'informazione agli altri nodi, questi sapranno che {\tt C} è raggiungibile tramite {\tt A}. Se qualche nodo decidesse di mandare un messaggio a {\tt C} lo invierebbe sull'interfaccia {\tt A} specificando {\tt C} come destinatario. {\tt A} lo inoltrerebbe a {\tt B} e {\tt B} lo inoltrerebbe a {\tt C}, in modo semplice ed immediato. \\
+	Molto spesso a questo tipo di messaggio sono associati scambi di informazioni sui nodi di backup.
+\subsubsection{{\tt MessageNotReachableCode}}
+	Il cambiamento di topologia più complesso da affrontare è accompagnato da questo messaggio. {\tt MessageNotReachableCode} viene inviato da tutti i nodi adiacenti ad un nodo quando questo si disconnette. Essendo i nodi connessi tramite { \tt TCP} non è necessario utilizzare messaggi di controllo ({\tt HELLO}) per rilevare le interruzioni di una connessione: la socket rileva automaticamente che l'altro capo del canale di comunicazione è irraggiungibile ed agisce di conseguenza.\\
+	I primi vicini del nodo disconnesso, dopo aver propagato ad ogni vicino rimanente il messaggio di disconnessione, si connettono automaticamente al nodo di backup che il nodo ha fornito loro, se presente (eventualmente riutilizzando la socket appena disconnessa). Dopo questa operazione le tabelle vengono aggiornate vicendevolmente. Ogni ex primo vicino del nodo disconnesso comunica la propria tabella al nuovo nodo di backup e viceversa. Fortunatamente non è necessario stabilire un ordine di invio / ricezione delle tabelle. Ad ogni invio di tabella corrisponde infatti una propagazione della tabella aggiornata in broadcast: questa procedura, seppure poco efficiente dal punto di vista di banda utilizzata, permette molta flessibilità nell'aggiornamento delle tabelle. \\
+	Ricevuto (o generato) il messaggio di codice {\tt MessageNotReachableCode} relativo ad un certo nodo, tutti i nodi raggiungibili tramite quello vengono eliminati dalla tabella e vengono generati altrettanti messaggi {\tt MessageNotReachableCode} relativi ai nodi eliminati. Questi nodi per la rete non esisteranno più, finché un messaggio {\tt MessageReachableCode} o {\tt MessageTableCode} ne segnaleranno la disponibilità ed il nuovo percorso. \\
+	{\tt TCP} garantisce che qualsiasi {\tt MessageReachableCode} o {\tt MessageTableCode} inviato dopo un\\ {\tt MessageNotReachableCode} arrivi nell'ordine in cui è stato inviato, vale a dire dopo il \\	 {\tt MessageNotReachableCode}, evitando situazioni anomale in cui {\tt MessageReachableCode} arriva prima di {\tt MessageNotReachableCode} facendo erroneamente intendere che il nodo specificato non sia più raggiungibile.
+
+\section{Architettura di Rete}
+L'architettura di rete risultante dall'algoritmo è molto regolare e l'assenza di cicli è dimostrabile per induzione. \\
+Osserveremo innanzitutto la configurazione statica della rete all'inizio del suo ciclo di vita ed in un istante generico; passeremo poi ad analizzare tutti i cambi di topologia per mostrare come nessuno di essi, partendo da una situazione senza cicli, genera cicli.
+
+\subsection{Analisi statica della rete}
+In generale, la topologia di rete è ad albero non bilanciato: il primo nodo ad essere online fa da padre a tutti i nodi da cui accetterà la connessione e questi ricorsivamente saranno padri dei nodi che si connetteranno a loro. Ogni nodo, al suo ingresso nella rete, si connette ad uno ed un solo nodo già appartenente alla rete: questa è la caratteristica che più di ogni altra assicura l'assenza di cicli.
+\subsubsection{La rete con un solo nodo}
+La rete iniziale ha un solo nodo attivo, in attesa di connessioni. Questa configurazione banalmente non presenta cicli.
+\subsubsection{La rete a regime}
+La rete a regime è visualizzabile come un grafo connesso aciclico o come un albero, le cui proprietà variano a seconda dell'algoritmo scelto per le procedure di connessione e riconnessione. Nel caso si voglia rappresentarla come albero, per motivi di chiarezza è opportuno adottare come radice il primo nodo della rete e come figli di un nodo tutti i nodi le cui richieste di connessione sono state accettate da questo. Questa è la configurazione che un algoritmo che implementa {\tt PRP} dovrebbe offrire alla fine di ogni cambio di topologia.
+
+\subsection{Analisi dinamica della rete}
+In questa sezione vengono analizzati tutti i possibili cambiamenti di topologia e viene mostrato come (nel codice di esempio) nessuno di questi generi cicli.
+\subsubsection{Aggiunta di un nuovo nodo}
+Il nuovo nodo può richiedere la connessione ad un nodo che ospita altri figli oppure ad una foglia dell'albero. In entrambi i casi, il nuovo nodo ha solo una connessione con il nodo padre, ed ogni altro nodo della rete può raggiungere il nuovo nodo solo attraverso il padre. L'aggiunta di un nuovo nodo pertanto non introduce cicli nella struttura della rete.
+\subsubsection{Aggiunta di un sottoalbero}
+Durante le riconnessioni, è possibile che la richiesta di connessione arrivi da un nodo che fa da padre ad altri nodi. Per ipotesi induttiva il nodo ed i suoi figli sono organizzati in un grafo connesso aciclico (o albero). Il nuovo sottoalbero può richiedere la connessione ad un nodo che ospita altri figli oppure ad una foglia dell'albero. In entrambi i casi, ogni nodo del sottoalbero ha un percorso privo di cicli per arrivare alla radice del sottoalbero, e la radice del sottoalbero ha una sola connessione con il nodo padre. Dall'esterno, ogni nodo della rete può raggiungere la radice del nuovo sottoalbero solo attraverso il padre della radice (attraverso un percorso privo di cicli), e può raggiungere ogni nodo del sottoalbero tramite la radice. L'aggiunta di un sottoalbero pertanto non introduce cicli nella struttura della rete.
+\subsubsection{Disconnessione di un nodo}
+Naturalmente la disconnessione di un nodo non porta alcun ciclo nella rete. La riconnessione di un nodo alla rete cade in uno dei due casi precedenti, pertanto non introduce cicli nella struttura della rete.
+
+\section{Gli strumenti utilizzati}
+Il codice di esempio è stato realizzato con pochi strumenti, consigliati per lo sviluppo delle estensioni allo stesso.
+\subsection{Eclipse IDE for Java}
+Per lo sviluppo del codice è stato usato l'IDE Eclipse, gratuito e reperibile all'indirizzo www.eclipse.org. Eclipse è ottimizzato per la programmazione Java e presenta molti strumenti pensati per l'ingegnerizzazione del software, quali:
+\begin{enumerate}
+	\item individuazione in tempo reale degli errori;
+	\item risoluzione automatizzata degli errori;
+	\item cambiamento automatico e project-wide di identificatori, nomi di classi e di metodi;
+	\item gestione semplificata di classpath, inclusioni e moduli.
+\end{enumerate}
+Eclipse presenta, inoltre, una piattaforma di sviluppo di plugin (basata su Java) che la rende aperta all'integrazione con altri sistemi.
+\subsection{Git - GitHub}
+Lo strumento di versionamento ed il servizio di hosting sono stati entrambi affidati a GitHub (https://github.com/), una soluzione popolare per lo sviluppo collaborativo di software anche a livello Open-Source.
+\subsubsection{Git}
+Git è un sistema software di controllo di versione distribuito, creato da Linus Torvalds nel 2005. Sviluppato principalmente per monitorare ed organizzare lo sviluppo del kernel di Linux, è stato gradualmente adottato da molti come il principale strumento di versionamento grazie alla sua efficienza ed al modello centralizzato di accettazione delle modifiche, che prevede la presenza di un supervisore che decida quali accettare e quali rifiutare. Eclipse include nativamente un plugin che permette di collegarsi ad un repository Git ed effettuare le operazioni di pull, push, merge.
+\subsubsection{GitHub}
+GitHub è un servizio web di hosting per lo sviluppo di progetti software (e non solo) che usa il sistema di controllo di versione Git. Spesso considerato un rivale di SourceForge.net per l'hosting di progetti Open-Source, offre vari strumenti di gestione del repository e personalizzazione e prevede alcuni piani di sviluppo enterprise a pagamento.
+\\ Il repository del progetto è mantenuto all'indirizzo https://github.com/fagiodarkie/PRP.
+\subsection{Java Development Kit}
+Il codice utilizza la libreria Java nella versione 1.7.0-51: sebbene sia possibile che qualche classe funzioni in modo differente utilizzando altre versioni della libreria, non sono state usate feature particolari (ad esempio database). Pertanto il codice dovrebbe virtualmente funzionare con qualsiasi libreria Java che fornisca le classi necessarie ({\tt InetAddress, Connection, Thread,} etc). Ad ogni modo, per evitare di utilizzare versioni troppo distanti tra loro si consiglia di utilizzare almeno jdk1.6.
+\subsection{Collaborare al progetto}
+Per collaborare al progetto è sufficiente installare Eclipse ed il plugin EGit, disponibile al sito www.eclipse.org/egit/. Occorre clonare il progetto dal repository specificato sopra, dopodiché è possibile lanciarlo direttamente o effettuare modifiche per poi fare {\tt commit} su un branch di PRP. 
+	\\ Se si desidera effettuare cambiamenti al repository Git o semplicemente continuare ad utilizzarlo come strumento di versionamento, occorre creare un account GitHub e richiedere al fondatore (reperibile all'indirizzo mail jacopo.freddi@studenti.unipr.it) l'accesso al repository specificando il proprio username GitHub.
+	\\ Se si desidera semplicemente testare il software, nel pacchetto definitivo è reso disponibile un file jar eseguibile che permette di avviare l'applicazione senza la necessità di replicare il repository.
+
+
+\section{La struttura software}
+La scelta di un linguaggio di programmazione fortemente Object-Oriented come Java ha permesso di modularizzare il codice in modo molto naturale. Di seguito vengono descritte le principali classi utilizzate (vengono tralasciate le interfacce e le classi di utilità, poco interessanti a questo fine).
+\subsection{PRPClient}
+	PRPclient è la classe contenente il metodo principale. All'avvio vengono istanziate le classi di:
+	\begin{itemize}
+		\item gestione della tabella;
+		\item gestione delle connessioni;
+		\item interfacciamento tra lato "client" e lato "server";
+		\item gestione dei comandi da parte dell'utente;
+		\item gestione della connessione con il proprio padre;
+	\end{itemize}
+
+\subsection{UserInformations}
+	Tipo di dato POJO (Plain Old Java Object, oggetto il cui stato viene scritto alla costruzione e si mantiene immutato) che raccoglie le informazioni su nickname, indirizzo IP e porta di ascolto di un altro nodo.
+
+\subsection{TableManager}
+	Classe che gestisce la tabella di inoltro del nodo: le entrate sono semplici coppie di nickname nella forma:
+	\begin{center} $\langle${\tt nickname del nodo A, nickname del nodo tramite il quale raggiungere A}$\rangle$. \end{center}
+	Questa classe fornisce informazioni sulla struttura della rete, ma dev'essere aggiornata ogni volta che un cambio di topologia viene registrato.
+
+\subsection{ServerComponent}
+	Lato `server' dell'applicazione: riceve messaggi dal lato client e si preoccupa dell'invio e della ricezione dei messaggi verso e dalla rete. Incapsula le classi di:
+	\begin{itemize}
+		\item gestione della tabella;
+		\item gestione delle connessioni;
+		\item gestione della comunicazione con il client;
+		\item una socket di tipo ServerSocket, atta a ricevere le comunicazioni dal client;
+	\end{itemize}
+	La scelta di un'architettura di questo tipo permette la massima libertà nella distribuzione delle classi: virtualmente, lato client e server del nodo potrebbero essere separati in due processi diversi, o addirittura due macchine diverse, rendendo il metodo di fruizione dell'applicazione molto più flessibile alle diverse esigenze.
+	
+\subsection{ServerComponent}
+	Gestisce i messaggi in arrivo dai nodi agendo di conseguenza. \\
+	Ogni modulo che comunica con un altro nodo, una volta ricevuto un messaggio, comunica a ServerComponent quale messaggio è stato ricevuto: ServerComponent si occupa quindi di propagare l'informazione a chi di dovere, ad esempio chiedendo a TableManager di aggiornare un'entrata.
+
+\subsection{POJOMessage}
+	Tipo di dato POJO contenente i campi tipici di un messaggio.
+
+\subsection{ParentsManager}
+	Modulo che mantiene la connessione del nodo con il proprio padre. Dato che l'algoritmo di selezione del nodo di backup implementato si applica solo in caso di disconnessione del proprio padre, solo questo modulo contiene la procedura di riconnessione al nodo di backup.
+
+\subsection{ParentClientManager}
+	Modulo interno a ParentsManager, che gestisce direttamente la comunicazione con il nodo padre.
+
+\subsection{NetworkConnectionsManager}
+	In apparenza un duplicato di TableManager, NetworkConnectionsManager gestisce una mappa $\langle${\tt nickname, informazioni}$\rangle$ da cui è possibile ricavare IP e porta di ascolto di un nodo a partire dal suo nickname.
+
+\subsection{ClientManager}
+	Modulo di comunicazione con un generico nodo. In questa versione dell'algoritmo questo modulo viene utilizzato con tutti i nodi che richiedono una connessione (i "figli"). \`E perciò privo della procedura di riconnessione al nodo di backup.
+
+\subsection{ClientCommunicationManager}
+	Modulo di comunicazione a basso livello: gestisce un thread separato per l'ascolto di messaggi in arrivo dal nodo ed invia i messaggi richiesti al nodo. Per ogni connessione nella rete viene creato un ClientCommunicationManager con relativo thread.
+
+\subsection{UserInterface}
+	Modulo che si occupa del settaggio manuale del proprio indirizzo IP, porta di ascolto e nickname. Assolve inoltre alle funzioni di ascolto e gestione dei comandi da tastiera dell'utente.
+
+
+
+\newpage
+\section{Suggerimenti ed estensioni}
+La presente relazione ha delineato i requisiti e le linee guida per l'implementazione di un protocollo che soddisfi alle specifiche. Alcune possibili estensioni e miglioramenti sono elencati sotto:
+\begin{enumerate}
+	\item aggiungere un meccanismo di cache che salva in locale i messaggi che dovrebbero essere inviati ai nodi disconnessi e cerca di inviarli a questi una volta che sono nuovamente raggiungibili, nell'ordine in cui sono stati inviati;
+	\item implementare una selezione user-friendly del nodo al quale connettersi;
+	\item implementare la rete come n-albero bilanciato invece che come grafo; rendere disponibili le procedure di disconnessione e riconnessione necessarie per mantenere bilanciato l'albero (seguendo le linee guida suggerite nel paragrafo apposito;
+	\item implementare la possibilità, da parte degli utenti, di definire gruppi di nodi per sfruttare al meglio il multicast;
+	\item implementare un meccanismo di `friendship' tra nodi per definire i limiti di connettività e di invio dei messaggi;
+	\item implementare una versione del protocollo che possa funzionare sulla piattaforma Android: per come è stato realizzato il codice di esempio la parte di gestione della rete può essere riutilizzata, mentre l'interfaccia grafica andrebbe sviluppata. Date le risorse limitate a disposizione dei cellulari, è consigliato implementare la struttura ad albero bilanciato per minimizzare i costi in risorse della gestione della rete.
+	\item implementare una procedura di controllo di unicità del nickname dei nodi: alla connessione di un nodo, la validità del nickname dichiarato viene controllata nella rete e, se nessun nodo ha ancora richiesto tale nickname, questo viene prenotato ed acquisito dal nuovo nodo. \\
+	In modo alternativo, assegnare un ID ad ogni nodo creato come funzione del nickname dichiarato e del timestamp di creazione. Notare che questa procedura è prona ad ambiguità nel caso un messaggio debba essere inviato ad un nickname posseduto da più di un nodo.
+	\item migliorare il punto precedente aggiungendo un metodo di autenticazione a chiave asimmetrica: Ogni nodo dovrà salvare in locale le chiavi pubbliche di ogni altro nodo;
+	\item aggiungere il timestamp ai campi dei messaggi e gestirne l'utilizzo;
+	\item per migliorare l'esperienza di utilizzo sul server, dividere il programma in due sezioni distinte: la parte server viene lanciata per prima e fornisce connettività verso la rete fungendo da nodo effettivo, mentre la parte client viene lanciata per seconda e si connette unicamente alla parte server. La parte server riceve messaggi dalla rete stampandoli e gestisce i messaggi provenienti dal client inoltrandoli sull'interfaccia giusta. Questa struttura permette di lavorare su due terminali separati e pulire l'interfaccia di invio dei messaggi dal flusso di messaggi ricevuti.
+\end{enumerate}
+
+
+\end{document}
