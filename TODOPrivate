@@ -1,4 +1,0 @@
-.... In ParentManager (e forse non solo) gli attributi delle classi sono implementazioni e non interfacce. Male.
-
-Il nome dei metodi e degli attributi dovrebbe iniziare per minuscola. Idem per i parametri e le variabili in generale.
-Le costanti invece tutte maiuscole.
